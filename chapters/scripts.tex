@@ -1,0 +1,999 @@
+\section{Codici Python}
+Nella presente appendice sono riportati i codici Python sviluppati per l'analisi dati delle varie esperienze di laboratorio.
+
+\subsection{Taratura di un trasduttore di pressione}\label{b1}
+\begin{lstlisting}
+from numpy import *
+from matplotlib.pyplot import *
+
+
+def main():
+    p1, E1, rms1 = load_data("Squadra1.txt", ",")
+    p2, E2, rms2 = load_data("Squadra2.txt", "\t")
+    p3, E3, rms3 = load_data("Squadra3.txt", None)
+    E1 -= E1[0]
+    E2 -= E2[1]
+    E3 -= E3[0]
+    E = [E1, E2, E3]
+    p = [p1, p2, p3]
+    rms = [rms1, rms2, rms3]
+
+    Kt = []
+    for i in range(3):
+        c = polyfit(E[:][i], p[:][i], 1)
+        Kt.append(c[0])
+ 
+    fsamp = 2000
+    i0 = 2480
+    t0 = i0 / fsamp
+    datat = load_trans()
+    transitorio = datat[i0:]
+
+    t = linspace(t0, 120 - 1/fsamp, len(datat) - i0)
+    e0 = average(datat[:i0-1000]) * ones(i0)
+    c = polyfit(t, log(-transitorio), 1)
+    b = c[0]
+    A = exp(c[1])
+    tau = -1/b
+    y = -A*exp(-t/tau)
+    t = concatenate((linspace(0, t0, i0), t))
+
+    print(f"Costante Kt squadra 1: {Kt[0]:.2f} Pa/V")
+    print(f"Costante Kt squadra 2: {Kt[1]:.2f} Pa/V")
+    print(f"Costante Kt squadra 3: {Kt[2]:.2f} Pa/V")
+    print(f"Tempo caratteristico tau = {tau:.2f} s")
+
+    figure(1)
+    scatter(p1, E1)
+    scatter(p2, E2)
+    scatter(p3, E3)
+    errorbar(p1, E1, yerr=rms[0], fmt="o")
+    errorbar(p2, E2, yerr=rms[1], fmt="o")
+    errorbar(p3, E3, yerr=abs(rms[2]), fmt="o")
+    xlabel(r"p$_{Betz}$ [Pa]")
+    ylabel("E [V]")
+    grid()
+    legend(("Squadra 1", "Squadra 2", "Squadra 3"))
+    savefig("images/kt", dpi=400)
+    close()
+
+    figure(2)
+    plot(t, datat, label="Dati sperimentali")
+    plot(t, concatenate((e0, y)), label="Curva interpolante")
+    xlabel("t [s]")
+    ylabel("E [V]")
+    grid()
+    legend()
+    savefig("images/transitorio", dpi=400)
+    close()
+
+
+def load_data(file, sep):
+    with open(file, 'r') as f:
+        p = []
+        E = []
+        rms = []
+        next(f)
+        for line in f:
+            values = [float(x) for x in line.strip().split(sep)]
+            p.append(values[0])
+            E.append(values[1])
+            rms.append(values[2])
+        p = array(p)
+        E = array(E)
+        rms = array(rms)
+        return p, E, rms
+
+
+def load_trans():
+    with open("Transitorio.txt", 'r') as f:
+        E = []
+        next(f)
+        next(f)
+        for line in f:
+            E.append(float(line.strip()))
+        E = array(E)
+        return E
+    
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\subsection{Risposta direzionale di un tubo di Pitot}\label{b2}
+\begin{lstlisting}
+from numpy import *
+from matplotlib.pyplot import *
+
+
+def main():
+    T0 = array([23.3, 24.2, 24.9, 23.9]) + 273.15
+    p0 = array([102300, 99400, 99400, 101200])
+    rho = p0 / T0 / 287
+    mu = 1.45e-6 * T0**1.5 / (110+T0)
+    D = 0.003
+    Kt = 550
+
+    ps, ptot, q = load_files()
+
+    qv = []
+    qv.append(Kt*(q[0][2, 1]-q[0][0, 1]))
+    qv.append(Kt*(q[1][1, 1]-q[1][0, 1]))
+    qv.append(Kt*(q[2][3, 1]-q[2][0, 1]))
+    qv.append(Kt*(q[3][1, 1]-q[3][0, 1]))
+    qv = array(qv)
+
+    V = sqrt(2 * qv / rho)
+    Re = rho * V * D / mu
+
+    eps, eptot, eq = [], [], []
+    for i in range(4):
+        eps.append((ps[i][:, 1] - ps[i][1, 1])/qv[i])
+        eptot.append((ptot[i][:, 1] - ptot[i][1, 1])/qv[i])
+        eq.append((q[i][:, 1] - q[i][0, 1] - qv[i])/qv[i])
+
+    figure(1)
+    for i in range(4):
+        scatter(ps[i][:, 0], eps[i], label=f"Sq {i+1}, Re: {Re[i]:.0f}")
+    grid()
+    title("Static Pressure")
+    xlabel(r"$\alpha$ [deg]")
+    ylabel(r"$\varepsilon$ [Pa/V]")
+    legend()
+    tight_layout()
+    savefig("images/p", dpi=400)
+    close()
+
+    figure(2)
+    for i in range(4):
+        scatter(ptot[i][:, 0], eptot[i], label=f"Sq {i+1}, Re: {Re[i]:.0f}")
+    grid()
+    title("Total Pressure")
+    xlabel(r"$\alpha$ [deg]")
+    ylabel(r"$\varepsilon$ [Pa/V]")
+    legend()
+    tight_layout()
+    savefig("images/ptot", dpi=400)
+    close()
+
+    figure(3)
+    for i in range(4):
+        scatter(q[i][:, 0], eq[i], label=f"Sq {i+1}, Re: {Re[i]:.0f}")
+    grid()
+    title("Dynamic Pressure")
+    xlabel(r"$\alpha$ [deg]")
+    ylabel(r"$\varepsilon$ [Pa/V]")
+    legend()
+    tight_layout()
+    savefig("images/q", dpi=400)
+    close()
+
+    qt1 = load_trans("Squadra 1/transitorioq.txt")-q[0][0, 1]
+
+    i0, i0f = 1500, 3000
+    e0 = average(qt1[:i0-300]) * ones(i0)
+    ef = average(qt1[i0f+300:]) * ones(len(qt1)-i0f)
+    t = linspace(i0/500, i0f/500, i0f-i0)
+    transitorio = qt1[i0:i0f]
+    c = polyfit(t, log((transitorio)), 1)
+    b = c[0]
+    A = exp(c[1])
+    tau = -1/b
+    y = A*exp(-t/tau)
+    y = concatenate((e0, y, ef))
+    t = linspace(0, 120-1/500, len(qt1))
+    plot(t, qt1, label="Dati sperimentali")
+    plot(t, y, label="Curva interpolante")
+    xlabel("t [s]")
+    ylabel("E [V]")
+    grid()
+    tight_layout()
+    legend()
+    savefig("images/transitorio", dpi=400)
+    close()
+
+    print(f"Tempo caratteristico: {tau*1000:.2f} ms")
+
+
+def load_files():
+    ps, ptot, q = [], [], []
+    ps.append(load_data("Squadra 1/ps.txt"))
+    ptot.append(load_data("Squadra 1/ptot.txt"))
+    q.append(load_data("Squadra 1/q.txt"))
+    ps.append(load_data("Squadra 2/ps.txt"))
+    ptot.append(load_data("Squadra 2/ptot.txt"))
+    q.append(load_data("Squadra 2/q.txt"))
+    ps.append(load_data("Squadra 3/ps.txt"))
+    ptot.append(load_data("Squadra 3/ptot.txt"))
+    q.append(load_data("Squadra 3/q.txt"))
+    ps.append(load_data("Squadra 4/ps.txt"))
+    ptot.append(load_data("Squadra 4/ptot.txt"))
+    q.append(load_data("Squadra 4/q.txt"))
+    return ps, ptot, q
+
+
+def load_data(file):
+    with open(file, 'r') as f:
+        a = []
+        E = []
+        rms = []
+        next(f)
+        for line in f:
+            values = [float(x) for x in line.strip().split()]
+            a.append(values[0])
+            E.append(values[1])
+            rms.append(values[2])
+        a = array(a)
+        E = array(E)
+        rms = array(rms)
+        return column_stack((a, E, rms))
+
+
+def load_trans(file):
+    with open(file, 'r') as f:
+        E = []
+        for line in f:
+            E.append(float(line.strip().split()[2]))
+        E = array(E)
+        return E
+    
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\subsection{Struttura del getto}\label{b3}
+\begin{lstlisting}
+from numpy import *
+from matplotlib.pyplot import *
+from glob import glob
+from mpl_toolkits.mplot3d import Axes3D
+from scipy.interpolate import interp1d
+
+
+def main():
+    Dj = 0.026
+    Kt = 550
+    p = 99400
+    T = 21.9 + 273.15
+    rho = p / T / 287
+    mu = 1.46E-6 * T**1.5 / (T + 110)
+
+    for sq in range(4):
+        file_paths = glob(f"Sq{sq+1}/x*.txt")
+        r, E, Erms, x = [], [], [], []
+        for file_path in file_paths:
+            if file_path == f"Sq{sq+1}/x0E0.txt":
+                E0 = loadtxt(file_path)[1]
+            else:
+                x.append(float(file_path.split('x')[1].split('.t')[0]))
+                r_i, E_i, Erms_i = genfromtxt(file_path, skip_header=1).T
+                r.append(r_i)
+                E.append(E_i)
+                Erms.append(Erms_i)
+        x, r, E, Erms = zip(*sorted(zip(x, r, E, Erms)))
+        x = array(x)
+        r, E, Erms = list(r), list(E), list(Erms)
+        for i in range(len(E)):
+            E[i] -= E0
+
+        if sq == 3: # Effetti spuri squadra 4
+            for i in range(len(r)):
+                r[i] -= 10/300 * x[i]
+
+        for i in range(len(x)):
+            r[i], E[i], Erms[i] = zip(*sorted(zip(r[i], E[i], Erms[i])))
+            r[i], E[i], Erms[i] = array(r[i]), array(E[i]), array(Erms[i])
+            E[i] = concatenate((E[i][r[i]>0][::-1], E[i][r[i]>=0]))
+            Erms[i] = concatenate((Erms[i][r[i]>0][::-1], Erms[i][r[i]>=0]))
+            r[i] = concatenate((-r[i][r[i]>0][::-1], r[i][r[i]>=0]))
+
+        U0 = sqrt(2 * max(E[0]) * Kt / rho)
+        for i in range(len(x)):
+            U = sign(2 * E[i] * Kt / rho)*sqrt(abs(2 * E[i] * Kt / rho))
+            Umax = max(U)
+            interp_func = interp1d(U[r[i]>0], r[i][r[i]>0], fill_value="extrapolate")
+            ru = interp_func(Umax/2)
+
+            figure(0)
+            plot(r[i], U, label=f"x={x[i]:.0f} mm")
+            figure(1)
+            plot(r[i]/Dj/1000, U/U0, label=f"x={x[i]:.0f} mm")
+            figure(2)
+            plot(r[i][r[i]>=0]/ru, U[r[i]>=0]/Umax, label=f"x={x[i]:.0f} mm")
+
+        figure(0)
+        title(f"Squadra {sq+1}")
+        xlabel("r [mm]")
+        ylabel("u(x,r) [m/s]")
+        grid()
+        legend()
+        tight_layout()
+        savefig(f"images/sq{sq+1}", dpi=400)
+        close()
+
+        figure(1)
+        title(f"Squadra {sq+1}")
+        xlabel(r"$\frac{r}{D_j}$")
+        ylabel(r"$\frac{u(x,r)}{U_0}$")
+        grid()
+        legend()
+        tight_layout()
+        savefig(f"images/sq{sq+1}u0", dpi=400)
+        close()
+
+        figure(2)
+        title(f"Squadra {sq+1}")
+        xlabel(r"$\frac{r}{r_{u=0.5U_{max}}(x)}$")
+        ylabel(r"$\frac{u(x,r)}{U_{max}(x)}$")
+        grid()
+        legend()
+        tight_layout()
+        savefig(f"images/sq{sq+1}umax", dpi=400)
+        close()
+
+        fig = figure(3)
+        ax = fig.add_subplot(111, projection='3d')
+        for i in range(len(x)):
+            _z = sign(2 * E[i] * Kt / rho)*sqrt(abs(2 * E[i] * Kt / rho))
+            _z = concatenate((_z[r[i]>=0][::-1], _z[r[i]>=0]))
+            _x = concatenate((-r[i][r[i]>=0][::-1], r[i][r[i]>=0]))
+            _y = x[i]*ones_like(_x)
+            ax.plot(_x, _y, _z)
+
+        ax.set_xlabel('r [mm]')
+        ax.set_ylabel('x [mm]')
+        ax.set_zlabel('u [m/s]')
+        tight_layout()
+        savefig(f"images/sq{sq+1}3d", dpi=600)
+        close()
+
+        Re = rho * U0 * Dj / mu
+        print(f"Reynolds squadra {sq+1}: {Re:.0f}")
+
+        close('all')
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\subsection{Proprietà del getto}\label{b4}
+\begin{lstlisting}
+from numpy import *
+from matplotlib.pyplot import *
+from glob import glob
+from scipy.interpolate import interp1d
+
+
+def main():
+    Dj = 0.026
+    Dp = 0.003
+    Kt = 550
+    p = 99400
+    T = 21.9 + 273.15
+    rho = p / T / 287
+    mu = 1.46E-6 * T**1.5 / (T + 110)
+
+    pts = [3, 3, 3, 2]
+
+    for sq in range(4):
+        file_paths = glob(f"Sq{sq+1}/x*.txt")
+        r, E, Erms, x = [], [], [], []
+        for file_path in file_paths:
+            if file_path == f"Sq{sq+1}/x0E0.txt":
+                E0 = loadtxt(f"Sq{sq+1}/x0E0.txt")[1]
+            else:
+                x.append(float(file_path.split('x')[1].split('.t')[0]))
+                r_i, E_i, Erms_i = genfromtxt(file_path, skip_header=1).T
+                r.append(r_i)
+                E.append(E_i)
+                Erms.append(Erms_i)
+        x, r, E, Erms = zip(*sorted(zip(x, r, E, Erms)))
+        x = array(x)
+        r, E, Erms = list(r), list(E), list(Erms)
+        for E_i in E:
+            E_i -= E0
+
+        if sq == 3: # Effetti spuri squadra 4
+            for i in range(len(r)):
+                r[i] -= 10/300 * x[i]
+
+        for i in range(len(x)):
+            r[i], E[i], Erms[i] = zip(*sorted(zip(r[i], E[i], Erms[i])))
+            r[i], E[i], Erms[i] = array(r[i]), array(E[i]), array(Erms[i])
+
+        Umax, delta = [], []
+        G, M, Ec = [], [], []
+        U0 = sqrt(2 * max(E[0]) * Kt / rho)
+        for i in range(len(x)):
+            U = sign(2 * E[i] * Kt / rho)*sqrt(abs(2 * E[i] * Kt / rho))
+            Umax.append(max(U))
+            interp_func = interp1d(U[r[i]>0], r[i][r[i]>0], fill_value="extrapolate")
+            delta.append(interp_func(max(U)/2))
+            G.append(trapz(2*pi*rho*U[r[i]>=0]*r[i][r[i]>=0]/1000, r[i][r[i]>=0]/1000))
+            M.append(trapz(2*pi*rho*(U[r[i]>=0]**2)*r[i][r[i]>=0]/1000, r[i][r[i]>=0]/1000))
+            Ec.append(trapz(pi*rho*(U[r[i]>=0]**3)*r[i][r[i]>=0]/1000, r[i][r[i]>=0]/1000))
+        delta = array(delta)
+
+        y_ = log(Umax[-pts[sq]:]/U0)
+        x_ = log(x[-pts[sq]:]/Dj/1000)
+        c = polyfit(x_, y_, 1)
+        m = -c[0]
+        k = exp(c[1])
+        xx = linspace(.1, 20)
+        f = k/(xx**m)
+        for i in range(len(f)):
+            if f[i] > 1:
+                f[i] = 1
+
+        G0 = rho * (pi*Dj**2/4) * U0
+        M0 = rho * (pi*Dj**2/4) * U0**2
+        Ec0 = 0.5 * rho * (pi*Dj**2/4) * U0**3
+        
+        Re = rho * U0 * Dj / mu
+        print(f"Squadra {sq+1} Re: {Re:.0f} m: {m:.3f} k: {k:.3f}")
+
+        figure(0)
+        d, = plot(array(x)/Dj/1000, Umax/U0, "o", label=f"Sq. {sq+1}. Re: {Re:.0f}")
+        plot(xx, f, color=d.get_color())
+        figure(1)
+        plot(array(x)/Dj/1000, delta/Dj/1000, "-o", label=f"Sq. {sq+1}. Re: {Re:.0f}")
+        figure(2)
+        plot(x, array(G)/G0, label=f"Squadra {sq+1}")
+        figure(3)
+        plot(x, array(M)/M0, label=f"Squadra {sq+1}")
+        figure(4)
+        plot(x, array(Ec)/Ec0, label=f"Squadra {sq+1}")
+
+    figure(0)
+    title("Velocita' massima")
+    xlabel(r"$\frac{x}{D_j}$")
+    ylabel(r"$\frac{U_{max}(x)}{U_0}$")
+    grid()
+    legend()
+    savefig("images/umax", dpi=400)
+
+    figure(1)
+    title("Dimensione trasversale del getto")
+    xlabel(r"$\frac{x}{D_j}$")
+    ylabel(r"$\frac{\Delta(x)}{D_j}$")
+    grid()
+    legend()
+    savefig("images/delta", dpi=400)
+
+    figure(2)
+    title("Portata")
+    xlabel(r"$\frac{x}{D_j}$")
+    ylabel(r"$\frac{G(x)}{G_0}$")
+    grid()
+    legend()
+    savefig("images/portata", dpi=400)
+
+    figure(3)
+    title("Quantita' di moto")
+    xlabel(r"$\frac{x}{D_j}$")
+    ylabel(r"$\frac{M(x)}{M_0}$")
+    grid()
+    axis([-25, 525, 0, 1.25])
+    legend()
+    savefig("images/qdm", dpi=400)
+
+    figure(4)
+    title("Energia cinetica")
+    xlabel(r"$\frac{x}{D_j}$")
+    ylabel(r"$\frac{E_c(x)}{E_{c0}}$")
+    grid()
+    legend()
+    savefig("images/energia", dpi=400)
+
+    close("all")
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\subsection{Profilo alare Naca 0015}\label{b5}
+\begin{lstlisting}
+import csv
+from numpy import *
+from matplotlib.pyplot import *
+
+
+def main():
+    x, cpd, cpv = import_data()
+    a, CL, CMLE, CM, xcp = ([[], [], [], []] for _ in range(5))
+    CLa, CMLEa, xac = (zeros(4) for _ in range(3))
+    for sq in range(4):
+        for k in range(7):
+            a[sq].append(cpd[sq][k+1][0])
+            CL[sq].append(trapz(array(cpv[sq][k+1][1:])-array(cpd[sq][k+1][1:]), x))
+            CMLE[sq].append(trapz(x*(array(cpd[sq][k+1][1:])-array(cpv[sq][k+1][1:])), x))
+        xcp[sq] = -array(CMLE[sq][1:])/array(CL[sq][1:])
+        CLa[sq] = polyfit(radians(a[sq][:5]), CL[sq][:5], 1)[0]
+        CMLEa[sq] = polyfit(radians(a[sq][:3]), CMLE[sq][:3], 1)[0]
+        xac[sq] = - CMLEa[sq]/CLa[sq]
+        CM[sq] = array(CMLE[sq]) + array(CL[sq]) * 0.25
+
+    save_cp_plots(x, cpd, cpv)
+    save_cl_plots(a, CL)
+    save_cmle_plots(a, CMLE)
+    save_xcp_plots(a, xcp)
+    save_cm_plot(a, CM)
+    save_cpfp_plot(x, cpd)
+    print(f"Posizione relativa del fuoco: {sum(xac)/len(xac):.4f}")
+
+    
+def save_cpfp_plot(x, cpd):
+    fp = loadtxt(open("cpcsv/Data(fp).csv", "rb"), delimiter=",", skiprows=1)
+    xfp = fp[:,0]
+    cpfp = fp[:,2]
+    title(f"Confronto con teoria del flusso potenziale")
+    plot(xfp, cpfp, '-o')
+    plot(x, cpd[0][1][1:], '-o')
+    xlabel("x/c")
+    ylabel("$c_p$")
+    gca().invert_yaxis()
+    grid()
+    legend(["Teoria del flusso potenziale", "Risultati sperimentali"])
+    savefig(f'images/cpfp')
+
+
+def save_cm_plot(a, CM):
+    for sq in range(4):
+        plot(a[sq], CM[sq],'-o')
+    ylim([-0.35, 0.35])
+    title(f"Coefficiente di momento aerodinamico")
+    xlabel("alpha [deg]")
+    ylabel("$C_{M}$")
+    grid()
+    legend(["Squadra 1", "Squadra 2", "Squadra 3", "Squadra 4"])
+    savefig(f'images/cm')
+    close()
+
+
+def save_xcp_plots(a, xcp):
+    for sq in range(4):
+        plot(a[sq][1:], xcp[sq], '-o')
+        title(f"Squadra {sq+1}, Centro di pressione")
+        xlabel("alpha [deg]")
+        ylabel("$x_{cp}/c$")
+        grid()
+        savefig(f'images/xcp{sq+1}')
+        close()
+    for sq in range(4):
+        plot(a[sq][1:], xcp[sq], '-o') 
+    title(f"Centro di pressione")
+    xlabel("alpha [deg]")
+    ylabel("$x_{cp}/c$")
+    grid()
+    legend(["Squadra 1", "Squadra 2", "Squadra 3", "Squadra 4"])
+    savefig(f'images/xcp')
+    close()
+
+
+def save_cmle_plots(a, CMLE):
+    for sq in range(4):
+        plot(a[sq], CMLE[sq], '-o')
+        title(f"Squadra {sq+1}, Coefficiente di momento al bordo di attacco")
+        xlabel("alpha [deg]")
+        ylabel("$c_{M_{LE}}$")
+        grid()
+        savefig(f'images/cmle{sq+1}')
+        close()
+    
+    for sq in range(4):
+        plot(a[sq], CMLE[sq], '-o')
+    title(f"Coefficiente di momento al bordo di attacco")
+    xlabel("alpha [deg]")
+    ylabel("$c_{M_{LE}}$")
+    grid()
+    legend(["Squadra 1", "Squadra 2", "Squadra 3", "Squadra 4"])
+    savefig(f'images/cmle')
+    close()
+
+
+def save_cl_plots(a, CL):
+    for sq in range(4):
+        plot(a[sq], CL[sq], '-o')
+        title(f"Squadra {sq+1}, Coefficiente di portanza")
+        xlabel("alpha [deg]")
+        ylabel("$c_L$")
+        grid()
+        savefig(f'images/cl{sq+1}')
+        close()
+    
+    for sq in range(4):
+        plot(a[sq], CL[sq], '-o')
+    title(f"Coefficiente di portanza")
+    xlabel("alpha [deg]")
+    ylabel("$c_L$")
+    grid()
+    legend(["Squadra 1", "Squadra 2", "Squadra 3", "Squadra 4"])
+    savefig(f'images/cl')
+    close()
+
+
+def save_cp_plots(x, cpd, cpv):
+    for sq in range(4):
+        for i in range(1, len(cpd[sq])):
+            title(f"Squadra {sq+1}, alpha={cpd[sq][i][0]:.0f} deg")
+            plot(x, cpd[sq][i][1:], '-o')
+            plot(x, cpv[sq][i][1:], '-o')
+            xlabel("x/c")
+            ylabel("$c_p$")
+            legend(["dorso", "ventre"])
+            gca().invert_yaxis()
+            grid()
+            savefig(f'images/cp{sq+1} a={cpd[sq][i][0]:.0f}')
+            close()
+
+    for sq in range(4):
+        for i in range(1, len(cpd[sq])):
+            plot(x, cpd[sq][i][1:], '-o', label=f"alpha={cpd[sq][i][0]}deg", color="bgrcmyk"[i-1])
+            plot(x, cpv[sq][i][1:], '-o', color="bgrcmyk"[i-1])
+        title(f"Coefficiente di pressione, Squadra {sq+1}")
+        xlabel("x/c")
+        ylabel("$c_p$")
+        legend()
+        gca().invert_yaxis()
+        grid()
+        savefig(f'images/cp{sq+1}')
+        close()
+
+
+def import_data():
+    x = array([0, 2.5, 5, 10, 20, 30, 40, 50, 60, 70, 80, 100])/100
+    cpd, cpv = [[], [], [], []], [[], [], [], []]
+    for sq in range(4):
+        with open(f'cpcsv/Data(cpd{sq+1}).csv', newline='') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                cpd[sq].append(row)
+            for row in range(1,len(cpd[sq])):
+                for i in range(13):
+                    cpd[sq][row][i] = float(cpd[sq][row][i])
+        with open(f'cpcsv/Data(cpv{sq+1}).csv', newline='') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                cpv[sq].append(row)
+            for row in range(1,len(cpv[sq])):
+                for i in range(13):
+                    cpv[sq][row][i] = float(cpv[sq][row][i])
+    return x, cpd, cpv
+    
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\subsection{Studio della scia del profilo alare Naca 0015}\label{b6}
+\begin{lstlisting}
+    from numpy import *
+    from matplotlib.pyplot import *
+    from scipy.interpolate import interp1d
+    
+    
+    def main():
+        c = 0.1
+        Re = [75000, 100000, 90000, 120000]
+    
+        data50 = loadtxt("xfoil50k.txt")
+        alpha50 = data50[:,0]
+        CDx50 = data50[:,2]
+        CLx50 = data50[:,1]
+        plot(alpha50, CDx50, label="XFOIL Re=50000", linewidth=1)
+    
+        data100 = loadtxt("xfoil100k.txt")
+        alpha100 = data100[:,0]
+        CDx100 = data100[:,2]
+        CLx100 = data100[:,1]
+        plot(alpha100,CDx100, label="XFOIL Re=100000", linewidth=1)
+        title("Coefficiente di resistenza (XFOIL)")
+        ylabel("$c_D$")
+        xlabel(r"$\alpha$ [$^\circ$]")
+        legend()
+        grid()
+        axis([-15.5, 15.5, 0.014, 0.12])
+        savefig("xfoil", dpi=400)
+        close()
+        
+        CDD = []
+    
+        for sq in range(4):
+            a, y, uOvV = import_data(sq)
+    
+            CD = zeros(len(a))
+            for i in range(len(a)):
+                CD[i] = 2/c * trapz(uOvV[i,:] * (1-uOvV[i,:]), y)
+            CDD.append(CD)
+            plot(concatenate((-a[::-1], a)), concatenate((CD[::-1], CD)), '-o', linewidth=1, markersize=3, label=f"Sq. {sq+1}, Re: {Re[sq]}")
+        grid()
+        axis([-15.5, 15.5, 0.014, 0.12])
+        title("Coefficiente di resistenza")
+        ylabel("$c_D$")
+        xlabel(r"$\alpha$ [$^\circ$]")
+        legend()
+        savefig("cd", dpi=400)
+        close()
+    
+        for sq in range(4):
+            Deltaw = []
+            a, y, uOvV = import_data(sq)
+            for alpha in range(len(a)):
+                figure(0)
+                plot(y, uOvV[alpha, :], label=r"$\alpha$"+f"={int(a[alpha])}"+r"$^\circ$")
+                ymin = y[argmin(uOvV[alpha, :])]
+                y90 = interp1d(uOvV[alpha, :], y, fill_value="extrapolate")(0.9*max(uOvV[alpha, :]))
+                Deltaw.append(abs(2 * (y90 - ymin)))
+            legend()
+            title(f"Squadra {sq+1}")
+            xlabel("$y$ [m]")
+            ylabel(r"$\frac{u}{V_\infty}$")
+            grid()
+            savefig(f"v{sq+1}")
+            close()
+    
+            figure(1)
+            plot(a, Deltaw, label=f"Squadra {sq+1}")
+        title("Dimensione trasversale della scia")
+        xlabel(r"$\alpha$ [$^\circ$]")
+        ylabel(r"$\Delta_w(\alpha)$ [m]")
+        legend()
+        grid()
+        savefig(f"dim scia", dpi=400)
+        close()
+    
+    
+        CL = []
+        CL.append([0.0, 0.21337719276250003, 0.39920634915000003, 0.5718014705999999, 0.6973437499999999, 0.8406250000000001, 0.6942023024999999])
+        CL.append([0.0, 0.2541666667875, 0.38419117663749996, 0.5542929292000001, 0.7519700460625001, 0.9096536999874999, 0.749770021375])
+        CL.append([0.0, 0.2407407410375, 0.457314560575, 0.6075206043, 0.7551504628000001, 0.8209433232375001, 0.764903846275])
+        CL.append([0.0, 0.1705337691125, 0.4198005699124999, 0.5916666666125001, 0.8583450423625, 0.9174688057000001, 0.9184906124625001])
+    
+        for i in range(4):
+            CL[i] = array(CL[i])
+            x = concatenate((CDD[i][:6], [CDD[i][-1]]))
+            plot(concatenate((x[::-1], x)), concatenate((-CL[i][::-1], CL[i])), label=f"Sq. {i+1}, Re: {Re[i]}")
+        grid()
+        title("Polare aerodinamica")
+        legend()
+        xlabel("$c_D$")
+        ylabel("$c_L$")
+        axis([0.015, 0.12, -1.2, 1.2])
+        savefig("clvcd", dpi=400)
+        close()
+    
+        plot(CDx50, CLx50, label="XFOIL Re=50000")
+        plot(CDx100, CLx100, label="XFOIL Re=100000")
+        grid()
+        title("Polare aerodinamica")
+        legend()
+        xlabel("$c_D$")
+        ylabel("$c_L$")
+        axis([0.015, 0.12, -1.2, 1.2])
+        savefig("clvcdxfoil", dpi=400)
+        close()
+    
+    
+    def import_data(sq):
+        raw = loadtxt(open(f"csv/Data(sq{sq+1}).csv", "rb"), delimiter=",")
+        alpha = raw[:,0]
+        uOvV = raw[:,1:]
+        y = linspace(0, 0.034, 18)
+        return alpha, y, uOvV
+    
+    
+    if __name__ == "__main__":
+        main()
+\end{lstlisting}
+
+\subsection{Flusso in un condotto piano}\label{b7}
+\begin{lstlisting}
+from numpy import *
+from matplotlib.pyplot import *
+from glob import glob
+
+
+def main():
+    H, B = 0.07, 0.3
+    D = 4*B*H/(2*(B+H))
+    x = [0, 0.38, 0.76, 1.185, 1.401, 1.785, 2.17, 2.59, 2.82, 3.19, 3.8]
+    pamb = array([101800, 101700, 101600, 101300])
+    T = array([20.2, 22, 22.1, 21.2]) + 273.15
+    rho = pamb / 287 / T
+    mu = 1.46E-6 * T**1.5 / (T + 110)
+
+    for sq in range(4):
+        file_paths = glob(f"sq{sq+1}/n*.dsa")
+        n, ptot, ps, p = [], [], [], []
+        for file_path in file_paths:
+            n.append(float(file_path.split("n")[1].split("_")[0]))
+            data = genfromtxt(file_path, skip_header=5).T
+            ptot.append(average(data[1]))
+            ps.append(average(data[2]))
+            p.append(array([average(data[i]) for i in range(3,14)]))
+        n, ptot, ps, p = zip(*sorted(zip(n, ptot, ps, p)))
+        n, ptot, ps, p = array(n), list(ptot), list(ps), list(p)
+
+        if sq == 1:
+            for i in range(len(n)):
+                p[i][3] = (p[i][2] + p[i][4])/2
+
+        q = array([ptot[i] - ps[i] for i in range(len(ptot))])*0.7225
+        u = sqrt(2*q/rho[sq])
+        Re = rho[sq] * u * D / mu[sq]
+        dpdx = array([polyfit(x, p[i], 1)[0] for i in range(len(n))])
+        lambd = -dpdx * D / q
+
+        figure(0)
+        plot(Re, dpdx, "o", label=f"Squadra {sq+1}")
+
+        figure(1)
+        plot(Re, lambd, "o", label=f"Squadra {sq+1}")
+
+        figure(2)
+        loglog(Re, lambd, "o", label=f"Squadra {sq+1}")
+
+    figure(0)
+    xlabel("Reynolds")
+    ylabel(r"$\frac{dp}{dx}$ [Pa/m]")
+    legend()
+    grid()
+    tight_layout()
+    savefig("images/dpdx", dpi=400)
+    close()
+
+    lam = lambda _Re: array([96/Re for Re in _Re])
+    turb = lambda _Re: array([0.32/Re**0.25 for Re in _Re])
+
+    figure(1)
+    Re_range = linspace(1600, 6000, 100)
+    plot(Re_range, lam(Re_range), label="Legge laminare")
+    Re_range = linspace(6000, 25000, 100)
+    plot(Re_range, turb(Re_range), label="Legge turbolenta")
+    xlabel("Reynolds")
+    ylabel(r"$\lambda$")
+    legend()
+    tight_layout()
+    grid(which='both')
+    savefig("images/lambda", dpi=400)
+    close()
+
+    figure(2)
+    Re_range = linspace(2000, 6000, 100)
+    loglog(Re_range, lam(Re_range), label="Legge laminare")
+    Re_range = linspace(6000, 50000, 100)
+    loglog(Re_range, turb(Re_range), label="Legge turbolenta")
+    xlabel("Reynolds")
+    ylabel(r"$\lambda$")
+    legend()
+    tight_layout()
+    grid(which='both')
+    savefig("images/lambdaloglog", dpi=400)
+    close()
+
+    figure(3)
+    plot(x, p[5], "o")
+    grid()
+    title(f"Squadra 4, Re={Re[5]:.0f}")
+    xlabel("x [m]")
+    ylabel(r"$\Delta p$ [Pa]")
+    savefig("images/p", dpi=400)
+    close()
+
+    close("all")
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\subsection{Taratura di una sonda a filo caldo}\label{b8}
+\begin{lstlisting}
+from numpy import *
+from matplotlib.pyplot import *
+
+
+def main():
+    raw, Et, U, E, x, y, A, B, n, Uk, U2, U3, U4, U5  = ([[], [], [], []] for _ in range(14))
+    a2, b2, c2 = ([[], [], [], []] for _ in range(3))
+    a3, b3, c3, d3 = ([[], [], [], []] for _ in range(4))
+    a4, b4, c4, d4, e4 = ([[], [], [], []] for _ in range(5))
+    a5, b5, c5, d5, e5, f5 = ([[], [], [], []] for _ in range(6))
+    epsk, eps2, eps3, eps4, eps5 = ([[], [], [], []] for _ in range(5))
+    E0t, E0 = zeros(4), zeros(4)
+
+    K = 550
+    p = array([735, 735, 735, 734])/760*101325
+    T = array([21, 20.8, 21.8, 20.8]) + 273.15
+    rho = p/287/T
+
+    for sq in range(4):
+        # Plot dati grezzi
+        raw[sq] = loadtxt(open(f"Misure/DatiCalibrazione_Sq_{sq+1}.txt", "rb"), skiprows=1)
+        Et[sq] = raw[sq][:, 0]
+        E[sq] = raw[sq][:, 1]
+        E0t[sq] = Et[sq][0]
+        E0[sq] = E[sq][0]
+        Et[sq] -= E0t[sq]
+        U[sq] = sqrt(2 / rho[sq] * K * Et[sq])
+        figure(4)
+        plot(U[sq], E[sq], '-o', label=f"Squadra {sq + 1}")
+        grid(True)
+        legend()
+        figure(sq)
+        plot(U[sq], E[sq], 'o')
+        grid()
+        title(f"Squadra {sq+1}")
+
+        # Legge di King
+        y[sq] = log10(E[sq][1:]**2 - E0[sq]**2)
+        x[sq] = log10(U[sq][1:])
+        A[sq] = E0[sq]**2
+        n[sq], B[sq] = polyfit(x[sq], y[sq], 1)
+        B[sq] = 10**B[sq]
+        # print(A[sq], B[sq], n[sq])
+
+        # Plot legge di King
+        Uk[sq] = lambda E: ((E**2 - A[sq])/B[sq])**(1/n[sq])
+        figure(sq)
+        plot(Uk[sq](linspace(E[sq][0], E[sq][-1])), linspace(E[sq][0], E[sq][-1]), label=f"King")
+
+        # Legge polinomiale quadratica
+        c2[sq], b2[sq], a2[sq] = polyfit(E[sq], U[sq], 2)
+        U2[sq] = lambda E: a2[sq] + b2[sq] * E + c2[sq] * E**2
+        figure(sq)
+        plot(U2[sq](linspace(E[sq][0], E[sq][-1])), linspace(E[sq][0], E[sq][-1]), label=f"Quadratica")
+
+        # Legge polinomiale cubica
+        d3[sq], c3[sq], b3[sq], a3[sq] = polyfit(E[sq], U[sq], 3)
+        U3[sq] = lambda E: a3[sq] + b3[sq] * E + c3[sq] * E**2 + d3[sq] * E**3
+        figure(sq)
+        plot(U3[sq](linspace(E[sq][0], E[sq][-1])), linspace(E[sq][0], E[sq][-1]), label=f"Cubica")
+
+        # Legge polinomiale di quarto grado
+        e4[sq], d4[sq], c4[sq], b4[sq], a4[sq] = polyfit(E[sq], U[sq], 4)
+        U4[sq] = lambda E: a4[sq] + b4[sq] * E + c4[sq] * E**2 + d4[sq] * E**3 + e4[sq] * E**4
+        figure(sq)
+        plot(U4[sq](linspace(E[sq][0], E[sq][-1])), linspace(E[sq][0], E[sq][-1]), label=f"Quarto grado")
+
+        # Legge polinomiale di quinto grado
+        f5[sq], e5[sq], d5[sq], c5[sq], b5[sq], a5[sq] = polyfit(E[sq], U[sq], 5)
+        U5[sq] = lambda E: a5[sq] + b5[sq] * E + c5[sq] * E**2 + d5[sq] * E**3 + e5[sq] * E**4 + f5[sq] * E**5
+        figure(sq)
+        plot(U5[sq](linspace(E[sq][0], E[sq][-1])), linspace(E[sq][0], E[sq][-1]), label=f"Quinto grado")
+
+        # Save figures
+        legend()
+        xlabel("$U_{pitot}$")
+        ylabel("$E_{HW}$")
+        savefig(f'images/sq{sq+1}')
+
+        # Stimatori
+        epsk[sq] = sqrt(sum(((Uk[sq](E[sq][1:])-U[sq][1:])/Uk[sq](E[sq][1:]))**2))
+        eps2[sq] = sqrt(sum(((U2[sq](E[sq][1:])-U[sq][1:])/U2[sq](E[sq][1:]))**2))
+        eps3[sq] = sqrt(sum(((U3[sq](E[sq][1:])-U[sq][1:])/U3[sq](E[sq][1:]))**2))
+        eps4[sq] = sqrt(sum(((U4[sq](E[sq][1:])-U[sq][1:])/U4[sq](E[sq][1:]))**2))
+        eps5[sq] = sqrt(sum(((U5[sq](E[sq][1:])-U[sq][1:])/U5[sq](E[sq][1:]))**2))
+        print(epsk[sq], eps2[sq], eps3[sq], eps4[sq], eps5[sq])
+
+    print(average(A), average(B), average(n))
+
+    figure(4)
+    xlabel(r"$U_{pitot}$")
+    ylabel(r"$E_{HW}$")
+    savefig(f"images/rawdata")
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
+
+\subsection{Strato limite su placca piana}\label{b9}
+
+\subsection{Vortex shedding di un cilindro}\label{b10}
+
+\subsection{PIV time resolved}\label{b11}
+
