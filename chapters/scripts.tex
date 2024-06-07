@@ -992,8 +992,334 @@ if __name__ == "__main__":
 \end{lstlisting}
 
 \subsection{Strato limite su placca piana}\label{b9}
+\begin{lstlisting}
+from glob import glob
+from pandas import *
+from numpy import *
+from matplotlib.pyplot import *
+from scipy.optimize import *
+from scipy.interpolate import interp1d
+from scipy.signal import welch
+
+
+def main():
+    A, B, n = 2.02849375, 0.6230599504639609, 0.5441415727388867
+    L, Height = 1.45, 0.5
+    blasius = loadtxt("Blasius.csv", delimiter=",")
+    eta_b, phi_b = blasius[:,0], blasius[:,1]
+    rho = 101100 / 287 / 293
+    mu = 1.46E-6 * 293**1.5 / (293 + 110)
+    nu = mu / rho
+    X = array([[0.55, 0.9],[0.5, 0.9],[0.9, 0.9],[0.7, 0.7]])
+    FS = [30000, 30000, 30000, 20000]
+
+    for sq in range(1,5):
+        for profilo in range(1,3):
+            file_paths = glob(f'Misure/Dati_Sq{sq}/Profilo{profilo}/*.csv')
+            E_i, y = [], []
+            for file_path in file_paths:
+                y.append(float(file_path.split('_')[2].split('.csv')[0]))
+                E_i.append(read_csv(file_path, header=None))
+            y = array(y)
+            if sq == 1:
+                y += 0.5
+            E = hstack(E_i)
+            sorted_indices = argsort(y)
+            E = E[:, sorted_indices]
+            y = y[sorted_indices]
+            cf = None
+
+            # Calcolo delle velocita'
+            # A = average(E[:,0])**2
+            U = sign(E**2-A)*abs(((E**2-A)/B))**(1/n)
+            u = array([average(U[:,i]) for i in range(U.shape[1])])
+            u_rms = array([std(U[:,i]) for i in range(U.shape[1])])
+
+            # Plot grandezze dimensionali
+            figure()
+            plot(u, y)
+            title(f"Squadra {sq} Profilo {profilo}")
+            xlabel("u [m/s]")
+            ylabel("y [mm]")
+            grid()
+            savefig(f'images/sq{sq}p{profilo}', dpi=400)
+            close()
+
+            # Calcolo proprieta' dello strato limite
+            Ue = max(u)
+            delta99 = interp1d(u, y, fill_value="extrapolate")(0.99*Ue)
+            deltastar = trapz(1-u/Ue, y)
+            theta = trapz(u/Ue*(1-u/Ue), y)
+            H = deltastar / theta
+
+            # Plot grandezze adimensionali
+            figure()
+            plot(u/Ue, y/delta99)
+            title(f"Squadra {sq} Profilo {profilo}")
+            xlabel(r"$\frac{u}{U_e}$")
+            ylabel(r"$\frac{y}{\delta_{99}}$")
+            grid()
+            savefig(f'images/sq{sq}p{profilo}_adim', dpi=400)
+            close()
+
+            # Plot RMS adimensionali
+            figure()
+            plot(u_rms/Ue, y/delta99)
+            title(f"Squadra {sq} Profilo {profilo}")
+            xlabel(r"$\frac{u_{rms}}{U_e}$")
+            ylabel(r"$\frac{y}{\delta_{99}}$")
+            grid()
+            savefig(f'images/sq{sq}p{profilo}_rms_adim', dpi=400)
+            close()
+
+            # Calcolo del numero di Reynolds
+            x = X[sq-1,profilo-1]
+            Rex = Ue*x/nu
+
+            if Rex < 500000:
+                # Confronto con Blasius in caso laminare
+                eta = y/1000/sqrt(nu*x/Ue)
+                phi = u/Ue
+
+                figure()
+                plot(phi, eta, label="Valori sperimentali")
+                plot(phi_b, eta_b, label="Blasius")
+                title(f"Squadra {sq} Profilo {profilo}")
+                xlabel(r"$\phi$")
+                ylabel(r"$\eta$")
+                legend()
+                grid()
+                savefig(f'images/sq{sq}p{profilo}_blasius', dpi=400)
+                close()
+
+            if Rex > 250000: 
+                # Metodo di Clauser
+                x_clauser = (y/1000 * Ue / nu)[1:]
+                y_clauser = (u / Ue)[1:]
+                clauser = lambda x, cf: sqrt(cf/2)*(log(x * sqrt(cf/2))/0.41 + 5.2)
+                cf = fmin(lambda cf: sum(abs(clauser(x_clauser, cf) - y_clauser)), 0.001, disp=0)[0]
+                tau_w = rho * Ue**2 * cf / 2
+
+                figure()
+                for i in range(8):
+                    semilogx(logspace(2, 5), clauser(logspace(2, 5), 0.0005 + i*0.0005), 'c')
+                semilogx(x_clauser, y_clauser, 'o')
+                title(f"Squadra {sq} Profilo {profilo}")
+                xlabel(r"$\frac{y\ U_e}{\nu}$")
+                ylabel(r"$\frac{u}{U_e}$")
+                grid()
+                savefig(f'images/sq{sq}p{profilo}clauser', dpi=400)
+                close()
+
+                # Confronto con Van Driest in caso turbolento
+                u_tau = sqrt(tau_w / rho)
+                y_plus = y/1000 * u_tau / nu
+                u_plus = u / u_tau
+                u_rms_plus = u_rms / u_tau
+
+                y_vd_visc = linspace(0, 5, 6)
+                u_vd_visc = y_vd_visc
+                y_vd_log = linspace(30, y_plus[-1])
+                u_vd_log = log(y_vd_log)/0.41 + 5.2
+                y_vd = concatenate((y_vd_visc, y_vd_log))
+                u_vd = concatenate((u_vd_visc, u_vd_log))
+
+                # Plot grandezze turbolente
+                figure()
+                plot(u_plus, y_plus, label="Dati sperimentali")
+                plot(u_vd, y_vd, label="Van Driest")
+                title(f"Squadra {sq} Profilo {profilo}")
+                xlabel("$u^+$")
+                ylabel("$y^+$")
+                legend()
+                grid()
+                savefig(f'images/sq{sq}p{profilo}+', dpi=400)
+                close()
+
+                # Plot RMS turbolenti
+                figure()
+                plot(u_rms_plus, y_plus)
+                title(f"Squadra {sq} Profilo {profilo}")
+                xlabel("$u^+_{rms}$")
+                ylabel("$y^+$")
+                grid()
+                savefig(f'images/sq{sq}p{profilo}+_rms', dpi=400)
+                close()
+
+            # Stampa risultati
+            print(f"Squadra {sq}, Profilo {profilo}")
+            print(f"Reynolds: {Rex:.0f}")
+            print(f"Ue \t= {Ue:.2f} m/s")
+            print(f"x \t= {x} m")
+            if cf is not None:
+                print(f"cf \t= {cf:.5f}")
+                print(f"tau_w \t= {tau_w:.2f} N/m2")
+            print(f"delta99 \t= {delta99:.2f} mm")
+            print(f"delta* \t= {deltastar:.2f} mm")
+            print(f"theta \t= {theta:.2f} mm")
+            print(f"H \t= {H:.2f}\n")
+
+            # Analisi temporale
+            E = loadtxt(glob(f'Misure/Dati_Sq{sq}/timeseries*.csv')[0])
+            U = sign(E**2-A)*abs(((E**2-A)/B))**(1/n)
+            fs = FS[sq-1]
+            Nx = len(U)
+            T = Nx / fs
+            t = linspace(0, T - 1/fs, Nx)
+
+            # Plot velocita' nel tempo
+            figure()
+            plot(t, U, linewidth=0.012)
+            title(f"Squadra {sq}")
+            xlabel("t [s]")
+            ylabel("u [m/s]")
+            grid()
+            savefig(f'images/sq{sq}timeseries', dpi=400)
+            close()
+            
+            # Parametri per lo spettro di potenza
+            nsc = int(floor(Nx / 4.5))
+            nov = int(floor(nsc / 2))
+            nff = max(256, 2**int(ceil(log2(nsc))))
+            f, Pxx = welch(U - average(U), fs, 'hann', nsc, nov, nff)
+
+            # Plot spettro di potenza
+            figure()
+            loglog(f, Pxx, linewidth=0.5)
+            title(f"Squadra {sq}")
+            xlabel("f [Hz]")
+            ylabel("Densita' spettrale di potenza")
+            grid()
+            savefig(f'images/sq{sq}timeserieswelch', dpi=400)
+            close()
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
 
 \subsection{Vortex shedding di un cilindro}\label{b10}
+\begin{lstlisting}
+import pandas as pd
+from numpy import *
+from matplotlib.pyplot import *
+from scipy.signal import welch
+
+
+def main():
+    E0, E, f = import_data()
+    p = array([740, 738, 737, 755]) / 760 * 101325
+    T = array([19, 24, 24, 23]) + 273.15
+    rho = p / T / 287
+    mu = 1.46E-6 * T**1.5 / (T + 110)
+    D = 1E-3
+
+    for sq in range(4):
+        E[sq] -= E0[sq]
+        U = sqrt(2 * E[sq] * 540 / rho[sq])
+
+        Re = rho[sq] * U * D / mu[sq]
+        St = f[sq] * D / U
+
+        figure()
+        plot(U, f[sq], "o")
+        title(f"Squadra {sq+1}")
+        xlabel(r"$U_\infty$ [m/s]")
+        ylabel(r"$f_{shedding}$ [Hz]")
+        grid()
+        savefig(f'images/sq{sq+1}', dpi=400)
+        close()
+
+        figure()
+        plot(Re, St, "o", label="Dati sperimentali")
+        plot(linspace(50, max(Re) + 10), St_t(linspace(50, max(Re) + 10)), label="Leggi empiriche")
+        title(f"Squadra {sq+1}")
+        xlabel("Reynolds")
+        ylabel("Strouhal")
+        legend()
+        grid()
+        savefig(f'images/sq{sq+1}adim', dpi=400)
+        close()
+
+        figure(0)
+        plot(Re, St, "o", label=f"Squadra {sq+1}")
+
+    plot(linspace(50, 1000), St_t(linspace(50, 1000)), label="Leggi empiriche")
+    xlabel("Reynolds")
+    ylabel("Strouhal")
+    legend()
+    grid()
+    savefig(f'images/adim', dpi=400)
+    close()
+
+    U = []
+    f_samp = 10000
+    with open("timeseries.txt", 'r') as f:
+        for line in f:
+            try:
+                U.append(float(line.strip().split()[2]))
+            except:
+                pass
+    U = array(U)
+    t = linspace(0, (len(U)-1)/f_samp, len(U))
+
+    Uavg = average(U)
+    Urms = std(U)
+    print(f"Velocita' media: {Uavg:.2f} m/s. rms: {Urms:.3f} m/s")
+
+    nsc = int(floor(len(U) / 4.5))
+    nov = int(floor(nsc / 2))
+    nff = max(256, 2**int(ceil(log2(nsc))))
+    f, Pxx = welch(U - Uavg, f_samp, 'hann', nsc, nov, nff)
+
+    plot(t, U, linewidth=0.2)
+    xlabel("t [s]")
+    ylabel("U [m/s]")
+    grid()
+    savefig(f'images/timeseries', dpi=400)
+    close()
+
+    loglog(f, Pxx, linewidth=0.5)
+    xlabel("f [Hz]")
+    ylabel("Densita' spettrale di potenza")
+    grid()
+    savefig(f'images/welch', dpi=400)
+    close()
+
+    print(f"Frequenza di sfilamento: {f[argmax(Pxx)]:.2f} Hz")
+    
+
+def St_t(_Re):
+    St = []
+    for Re in _Re:
+        if Re == 50:
+            St.append(0)
+        elif 50 < Re <= 150:
+            St.append(0.212 * (1-21.2/Re))
+        elif 150 < Re <= 300:
+            St.append(0.212 * (1-17/Re))
+        elif 300 < Re <= 2000:
+            St.append(0.212 * (1-12.7/Re))
+    return St
+
+
+def import_data():
+    file_path = "Misure.xlsx"
+    excel_file = pd.ExcelFile((file_path))
+    sheet_names = excel_file.sheet_names
+    dfs = [pd.read_excel(file_path, sheet_name=sheet) for sheet in sheet_names]
+    s, E0, E, f = [], [], [], []
+    for sq in range(4):
+        s.append(dfs[sq].values.tolist())
+        E0.append(s[sq][0][0])
+        E.append(array([s[sq][x][0] for x in range(1, len(s[sq]))]))
+        f.append(array([s[sq][x][1] for x in range(1, len(s[sq]))]))
+    return E0, E, f
+
+
+if __name__ == "__main__":
+    main()
+\end{lstlisting}
 
 \subsection{PIV time resolved}\label{b11}
 
