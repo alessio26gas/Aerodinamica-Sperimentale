@@ -216,7 +216,7 @@ Si ottengono i seguenti risultati per le grandezze caratteristiche dello strato 
 \end{table}
 
 \noindent Si evince che il parametro di forma in alcune configurazioni non rispetta la considerazione teorica precedentemente espressa. Questo è dovuto al fatto che in alcune configurazioni lo strato limite è transizionale, e presenta pertanto turbolenza intermittente. Si osserva inoltre come lo spessore geometrico $\delta_{99}$ dello strato limite sia fortemente influenzato dalla distanza $x$ dal bordo di attacco della placca piana (lo spessore dello strato limite aumenta lungo la placca piana).\\\\
-\noindent È opportuno confrontare i risultati ottenuti con i risultati empirici previsti dalla teoria:
+\noindent È opportuno confrontare i risultati ottenuti con le soluzioni empiriche:
 \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|c|c|c|c|}
@@ -236,7 +236,7 @@ Si ottengono i seguenti risultati per le grandezze caratteristiche dello strato 
 \noindent Come già accennato, i dati risultanti delle formulazioni empiriche per alcune configurazioni si discostano dai risultati sperimentali per via del regime transizionale dello strato limite.\\\\
 Nel caso di strato limite laminare la soluzione delle equazioni porta alla soluzione esatta di Blasius, che definisce il profilo di velocità in forma adimensionale:
 \begin{equation*}
-    \eta(x,y) \approx \frac{y}{\delta(x)} = y\sqrt{\frac{U_\infty}{\nu x}} \qquad f^\prime = \frac{u}{V_\infty}
+    \eta(x,y) = y\sqrt{\frac{U_\infty}{\nu x}} \qquad \phi = \frac{u}{U_\infty}
 \end{equation*}
 È opportuno confrontare la teoria di Blasius con i risultati sperimentali ottenuti. Si ottengono quindi i seguenti diagrammi:
 \begin{figure}[H]
@@ -256,76 +256,16 @@ Nel caso di strato limite laminare la soluzione delle equazioni porta alla soluz
 \noindent Si osserva come la soluzione di Blasius approssimi bene i valori dei dati sperimentali, seppur non perfettamente. La discrepanza è dovuta al fatto che nonostante il numero di Reynolds locale $Re_x$ sia inferiore al numero di Reynolds critico $Re_{cr}$, lo strato limite non sia completamente laminare bensì transizionale, e presenti quindi fenomeni di turbolenza intermittente.\\\\
 L'andamento spurio che si evidenzia nei dati sperimentali per la seconda squadra è dovuto ad un'interferenza con il sostegno della sonda a filo caldo durante l'acquisizione dei dati.
 
+% Clauser
 
-% \subsection{Strato limite laminare}
+% Grandezze +, RMS +
 
-% \subsubsection{Grandezze notevoli dello strato limite}
-% Dal grafico di velocità media si può quindi ricavare lo spessore geometrico dello strato limite laminare $\delta = 2.2 \ mm$.\\
-% Per quanto riguarda lo spessore di spostamento:
+% Analisi temporale, spettro di potenza
 
-% \begin{equation*}
-%     \delta^* = \int_{\infty}^{0} \left(1 - \frac{u}{U_e}\right) \, dy = 3.449
-%  \ mm
-% \end{equation*}
-
-% Lo spessore di quantità di moto
-
-% \begin{equation*}
-%     \theta = \int_{\infty}^{0} \frac{u}{U_e} \cdot\left(1 - \frac{u}{U_e}\right) \, dy = 1.918 \ mm
-% \end{equation*}
-
-% E infine il parametro di forma
-
-% \begin{equation*}
-%     H = \frac{\delta^*}{\theta} = 1.798 \ mm
-% \end{equation*}
-
-% \subsubsection{Profili di velocità media e fluttuazioni adimensionali}
-
-% Vengono presentate le velocità medie e le fluttuazioni adimensionalizzate rispettivamente come 
-
-% \begin{equation*}
-%     \frac{u}{U_{\infty}} = f \left( \frac{y}{\delta} \right)
-% \end{equation*}
-
-% \begin{equation*}
-%     \frac{u_{\text{rms}}}{U_{\infty}} = f \left( \frac{y}{\delta} \right)
-% \end{equation*}
-
-% \subsubsection{Confronto con la teoria di Blausius}
-% Viene costruita una variabile adimensionale $\eta = \frac{y}{\delta}$ con $\delta$ spessore geometrico.\\
-% E' possibile quindi esprimere le equazioni del moto come
-
-% \begin{equation*}
-%     ff^{''} + 2 f^{'''} = 0
-% \end{equation*}
-
-% con $f = f(\eta)$ e $f^{'} = \frac{u}{U_\infty}$. Si ottiene una soluzione tabulata che viene riportata in appendice. Si denota comunque che fino a un certo numero di Reynolds, cioè fino a quando lo strato limite è da considerarsi laminare, si ha una soluzione unica per i profili di velocità. E' come se il flusso fosse self-similare.\\
-% Di seguito viene presentato il confronto tra i dati sperimentali e la soluzione di Blausius
 
 % \subsection{Strato limite turbolento}
 % \subsubsection{Profilo di velocità media e fluttuazioni di velocità}
 % Si presentano i profili dei sperimentali relativi alle velocità medie e alle fluttuazioni di velocità
-
-% \subsubsection{Grandezze notevoli dello strato limite}
-% Dal grafico di velocità media anche per il caso turbolento si può ricavare lo spessore geometrico dello strato limite laminare $\delta = 5.05 \ mm$.\\
-% Per quanto riguarda lo spessore di spostamento:
-
-% \begin{equation*}
-%     \delta^* = \int_{\infty}^{0} \left(1 - \frac{u}{U_e}\right) \, dy = 0.204 \ mm 
-% \end{equation*}
-
-% Lo spessore di quantità di moto
-
-% \begin{equation*}
-%     \theta = \int_{\infty}^{0} \frac{u}{U_e} \cdot\left(1 - \frac{u}{U_e}\right) \, dy = 1.7 \ mm
-% \end{equation*}
-
-% E infine il parametro di forma
-
-% \begin{equation*}
-%     H = \frac{\delta^*}{\theta} = 1.201 \ mm
-% \end{equation*}
 
 % \subsubsection{Profili di velocità media e fluttuazioni adimensionali}
 
