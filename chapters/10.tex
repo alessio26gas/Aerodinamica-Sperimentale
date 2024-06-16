@@ -177,9 +177,33 @@ Per fare ciò, si traccia un diagramma che ha come ascisse il numero di punti $n
     \caption{Analisi di convergenza della velocità media}
 \end{figure}
 
+\noindent Si fa lo stesso per la deviazione standard della velocità $u_{rms}$:
 \begin{figure}[H]
     \centering
     \includegraphics[width=.48\textwidth]{images/10/conv4.png}
     \includegraphics[width=.48\textwidth]{images/10/conv3.png}
     \caption{Analisi di convergenza della deviazione standard}
 \end{figure}
+
+\noindent Si osserva come i valori di velocità media e deviazione standard tendino ad un asintoto con l'aumentare del numero di punti considerati $n$.\\\\
+Utilizzando delle grandezze adimensionali, rapportando la velocità media e la deviazione standard con il valore che assumono considerando tutti i 20000 punti, si ottiene il seguente diagramma:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.48\textwidth]{images/10/connvoverlapzoomed.png}
+    \includegraphics[width=.48\textwidth]{images/10/connvoverlap.png}
+    \caption{Confronto tra velocità media e deviazione standard adimensionali}
+\end{figure}
+
+\noindent Si evince che la velocità media converge più velocemente (cioè con un numero di punti inferiore) rispetto alla deviazione standard.\\\\
+Si può estendere l'analisi di convergenza ai momenti statistici di ordine superiore, considerando la skewness $S$ e la flatness $T$:
+\begin{equation*}
+    S = \frac{\overline{(U-\overline U)^3}}{u_{rms}^3} \qquad T = \frac{\overline{(U-\overline U)^4}}{u_{rms}^4}
+\end{equation*}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.65\textwidth]{images/10/convall.png}
+    \caption{Convergenza dei momenti statistici fino al quarto ordine}
+\end{figure}
+
+\noindent Si osserva come i momenti statistici di ordine superiore convergono più lentamente della velocità media e della deviazione standard.
