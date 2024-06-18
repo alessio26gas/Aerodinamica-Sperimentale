@@ -1320,3 +1320,166 @@ def import_data():
 if __name__ == "__main__":
     main()
 \end{lstlisting}
+
+\subsection{PIV time resolved}\label{b11}
+Per l'analisi dati della presente esercitazione sono stati utilizzati i seguenti codici in Matlab:
+\begin{lstlisting}[style=Matlab-editor, basicstyle=\ttfamily\footnotesize]
+close all
+clear
+clc
+
+filename = "PIV/2022/cilindro_22_600.mat";
+disp("Loading data...")
+load(filename)
+frames = length(u_original);
+fps = 60;
+frameWidth = 1080;
+
+%%
+screenSize = get(0, 'ScreenSize');
+screenWidth = screenSize(3);
+screenHeight = screenSize(4);
+
+M(frames) = struct('cdata',[],'colormap',[]);
+
+x_original = x;
+y_original = y;
+
+x_min = min(cellfun(@(x) min(x(:)), x_original));
+x_max = max(cellfun(@(x) max(x(:)), x_original));
+y_min = min(cellfun(@(y) min(y(:)), y_original));
+y_max = max(cellfun(@(y) max(y(:)), y_original));
+
+u_max = max(cellfun(@(u) max(abs(u(:))), u_original));
+v_max = max(cellfun(@(v) max(abs(v(:))), v_original));
+V_max = sqrt(u_max^2 + v_max^2);
+
+h = figure("Visible", "off");
+box on
+xlabel("x [m]")
+ylabel("y [m]")
+frameHeight = frameWidth*(y_max-y_min)/(x_max-x_min);
+left = (screenWidth - frameWidth) / 2;
+bottom = (screenHeight - frameHeight) / 2;
+set(h, "Position", [left, bottom, frameWidth, frameHeight]);
+
+for frame=1:frames
+    u = u_original{frame};
+    v = v_original{frame};
+    xf = x{frame};
+    yf = y{frame};
+    Vmag = sqrt(u.^2+v.^2);
+    
+    imagesc(xf(1,:),yf(:,1),Vmag,'Interpolation','bilinear');
+    hold on
+    clim([0 V_max*0.7])
+    axis([x_min x_max y_min y_max]);
+    colormap(jet)
+    clb=colorbar;
+    title(clb,'V [m/s]')
+    set(streamslice(xf,yf,u,v,0.3),'Color','k')
+    quiver(xf,yf,u/40,v/30, "off", 'Color','k')
+    hold off
+
+    drawnow
+    M(frame) = getframe;
+    disp("Frame " + frame + " completed")
+end
+disp("Saving progress...")
+save(filename)
+
+%%
+close all
+h = figure();
+box on
+xlabel("x [m]")
+ylabel("y [m]")
+clim([0 V_max*0.7])
+axis([x_min x_max y_min y_max]);
+colormap(jet)
+clb=colorbar;
+title(clb,'V [m/s]')
+set(h, "Position", [left, bottom, frameWidth, frameHeight]);
+disp("Playing animation...")
+movie(M, 10, fps);
+\end{lstlisting}
+
+\begin{lstlisting}[style=Matlab-editor, basicstyle=\ttfamily\footnotesize]
+close all
+clear
+
+anno = 23;
+
+disp("Loading data...")
+if anno == 22
+    filename = "PIV/2022/cilindro_22_600.mat";
+    ix = 14; % x = 0.0792;
+    iy = 17; % y = 0.0654;
+    ix_inf = 16; % x = 0.0792;
+    iy_inf = 17; % y = 0.0169;
+elseif anno == 23
+    filename = "PIV/2023/cilindro_23_600.mat";
+    ix = 20; % x = 0.046;
+    iy = 28; % y = 0.0641;
+    ix_inf = 26; % x = 0.0652;
+    iy_inf = 5; % y = 0.0748;
+end
+load(filename)
+frames = length(u_original);
+
+u = zeros(frames, 1);
+u_inf = zeros(frames, 1);
+
+for frame=1:frames
+    if anno == 22
+        u_inf(frame) = u_original{frame}(iy_inf, ix_inf);
+    elseif anno == 23
+        u_inf(frame) = v_original{frame}(iy_inf, ix_inf);
+    end
+    u(frame) = v_original{frame}(iy, ix);
+end
+
+k = figure();
+plot(linspace(0, frames/fps, frames), u)
+xlabel("t [s]")
+ylabel("u [m/s]")
+grid minor
+print(k, sprintf('timeseries%d.png', anno), '-dpng', '-r300');
+
+Fs = fps;
+Nx = length(u);
+f = (0:floor(Nx/2)) * (Fs/Nx);
+
+q = figure();
+U = fft(u - mean(u));
+hold on
+loglog(f, abs(real(U(1:floor(Nx/2)+1))));
+loglog(f, abs(imag(U(1:floor(Nx/2)+1))));
+legend("Parte reale", "Parte immaginaria")
+xlabel('f [Hz]')
+ylabel('Fast Fourier Transform [m/s]')
+grid on
+print(q, sprintf('FFT%d.png', anno), '-dpng', '-r300');
+
+j = figure();
+Pxx = (1/(Fs*Nx)) * abs(U).^2;
+Pxx = Pxx(1:floor(Nx/2)+1);
+loglog(f, Pxx);
+xlabel('f [Hz]')
+ylabel('Power Spectral Density (PSD) [J/kg]')
+grid on
+print(j, sprintf('PSD%d.png', anno), '-dpng', '-r300');
+
+[pxxmax, ind] = max(Pxx);
+disp("Frequenza di shedding: " + f(ind) + " Hz")
+
+U_inf = mean(abs(u_inf(isfinite(u_inf))));
+disp("Velocita' a monte: " + U_inf)
+D = 0.01;
+nu_w = 0.000931 / 1000;
+Re = U_inf * D / nu_w;
+St = f(ind) * D / U_inf;
+
+disp("Numero di Reynolds: " + Re)
+disp("Numero di Strouhal: " + St)
+\end{lstlisting}
