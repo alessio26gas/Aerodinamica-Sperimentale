@@ -233,7 +233,9 @@ Si ottengono i seguenti risultati per le grandezze caratteristiche dello strato 
     \end{tabular}
 \end{table}
 
-\noindent Come già accennato, i dati risultanti delle formulazioni empiriche per alcune configurazioni si discostano dai risultati sperimentali per via del regime transizionale dello strato limite.\\\\
+\noindent Come già accennato, i dati risultanti delle formulazioni empiriche per alcune configurazioni si discostano dai risultati sperimentali per via del regime transizionale dello strato limite.
+
+\subsubsection{Strato limite laminare}
 Nel caso di strato limite laminare la soluzione delle equazioni porta alla soluzione esatta di Blasius, che definisce il profilo di velocità in forma adimensionale:
 \begin{equation*}
     \eta(x,y) = y\sqrt{\frac{U_\infty}{\nu x}} \qquad \phi = \frac{u}{U_\infty}
@@ -256,79 +258,209 @@ Nel caso di strato limite laminare la soluzione delle equazioni porta alla soluz
 \noindent Si osserva come la soluzione di Blasius approssimi bene i valori dei dati sperimentali, seppur non perfettamente. La discrepanza è dovuta al fatto che nonostante il numero di Reynolds locale $Re_x$ sia inferiore al numero di Reynolds critico $Re_{cr}$, lo strato limite non sia completamente laminare bensì transizionale, e presenti quindi fenomeni di turbolenza intermittente.\\\\
 L'andamento spurio che si evidenzia nei dati sperimentali per la seconda squadra è dovuto ad un'interferenza con il sostegno della sonda a filo caldo durante l'acquisizione dei dati.
 
-% Clauser
+\subsubsection{Strato limite turbolento}
+Nel caso di strato limite turbolento, è opportuno considerare le variabili interne dello strato limite $u^+$ e $y^+$, dove:
+\begin{equation*}
+    y^+ = \frac{y u_\tau}{\nu} \qquad u^+ = \frac{u}{u_\tau} \qquad u_\tau = \sqrt{\frac{\tau_w}{\rho}} = U_e \sqrt{\frac{c_f}2}
+\end{equation*}
+Per ricavare il coefficiente di sforzo di attrito a parete $c_f$ si utilizza il metodo di Clauser, che ricorre alla legge logaritmica di parete:
+\begin{equation*}
+    \frac{u}{u_\tau} = \frac 1k \ln \frac{y u_\tau}{\nu} + C
+\end{equation*}
+Se si moltiplica e divide per la velocità esterna $U_e$, si ottiene:
+\begin{equation*}
+    \frac{u}{U_e} = \frac{u_\tau}{U_e}\left[ \frac 1k \ln\left( \frac{yU_e}{\nu}\frac{u_\tau}{U_e} \right) +C\right] = \sqrt{\frac{c_f}2}\left[ \frac 1k \ln\left( \frac{yU_e}{\nu}\sqrt{\frac{c_f}2} \right) +C\right]
+\end{equation*}
+Il metodo prevede di diagrammare i dati in forma semilogaritmica. In ascisse si riporta $yU_e/\nu$ con asse logaritmico e in ordinate si riporta la velocità adimensionale $u/U_e$ con asse lineare. Si tracciano quindi delle curve parametriche corrispondenti ai profili di velocità al variare del coefficiente di sforzo di attrito a parete $c_f$.
+\newpage
+\noindent In questo modo si costruisce la mappa di Clauser:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq1p2clauser.png}
+    \caption{Mappa di Clauser per il profilo turbolento della prima squadra}
+\end{figure}
 
-% Grandezze +, RMS +
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq2p2clauser.png}
+    \caption{Mappa di Clauser per il profilo turbolento della seconda squadra}
+\end{figure}
 
-% Analisi temporale, spettro di potenza
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq3p1clauser.png}
+    \caption{Mappa di Clauser per il profilo turbolento della terza squadra}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq4p2clauser.png}
+    \caption{Mappa di Clauser per il profilo turbolento della quarta squadra}
+\end{figure}
 
-% \subsection{Strato limite turbolento}
-% \subsubsection{Profilo di velocità media e fluttuazioni di velocità}
-% Si presentano i profili dei sperimentali relativi alle velocità medie e alle fluttuazioni di velocità
+\newpage
+\noindent Dalle mappe di Clauser ottenute è possibile ricavare il coefficiente di sforzo di attrito a parete $c_f$, quindi lo sforzo di attrito a parete $\tau_w$ e la velocità di attrito $u_\tau$, secondo le relazioni:
+\begin{equation*}
+    \tau_ w = \frac12 \rho U_e^2 c_f \qquad u_\tau = \sqrt{\frac{\tau_w}\rho}=U_e\sqrt{\frac{c_f}2}
+\end{equation*}
+Per le quattro squadre si ottiene:\\
+Squadra 1: $c_f = 0.00474\ \rightarrow\ \tau_w = 0.22\,N/m^2$\\
+Squadra 2: $c_f = 0.00447\ \rightarrow\ \tau_w = 0.32\,N/m^2$\\
+Squadra 3: $c_f = 0.00454\ \rightarrow\ \tau_w = 0.33\,N/m^2$\\
+Squadra 4: $c_f = 0.00453\ \rightarrow\ \tau_w = 0.31\,N/m^2$\\\\
+I risultati sperimentali rispettano le leggi empiriche precedentemente enunciate.\\\\
+Una volta ricavata la velocità di attrito, è possibile calcolare le grandezze interne dello strato limite turbolento $u^+$ e $y^+$.\\\\
+Si ottengono quindi i seguenti diagrammi per le quattro squadre, dove si evidenzia un asintoto orizzontale per:
+\begin{equation*}
+    u^+_{asint} = \sqrt{\frac{2}{c_f}} = \frac{U_e}{u_\tau}
+\end{equation*}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{images/9/sq1p2+.png}
+    \caption{Diagramma $u^+=f(y^+)$ per la prima squadra}
+\end{figure}
 
-% \subsubsection{Profili di velocità media e fluttuazioni adimensionali}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{images/9/sq2p2+.png}
+    \caption{Diagramma $u^+=f(y^+)$ per la seconda squadra}
+\end{figure}
 
-%  Le velocità medie e le fluttuazioni adimensionalizzate nel caso turbolento con la medesima adimensionalizzazione del caso laminare si presentano come:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{images/9/sq3p1+.png}
+    \caption{Diagramma $u^+=f(y^+)$ per la terza squadra}
+\end{figure}
 
-% \subsubsection{Diagramma con variabili interne dello strato limite}
-% Si sfrutta il Metodo di Clauser per tracciare i profili di velocità media e delle fluttuazioni adimensionalizzati con le variabili interne dello strato limite.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq4p2+.png}
+    \caption{Diagramma $u^+=f(y^+)$ per la quarta squadra}
+\end{figure}
 
-% \begin{equation*}
-%     u^+ = \frac{\Bar{U}}{u_\tau} = f(y^+)
-% \end{equation*}
+\noindent Si diagrammano inoltre le fluttuazioni adimensionali $u^+_{rms}$ in funzione della coordinata interna $y^+$:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq1p2+_rms.png}
+    \caption{Fluttuazioni adimensionali $u^+_{rms}=f(y^+)$ per la prima squadra}
+\end{figure}
 
-% \begin{equation*}
-%     \frac{u_{rms}}{u_\tau} = f(y^+)
-% \end{equation*}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{images/9/sq2p2+_rms.png}
+    \caption{Fluttuazioni adimensionali $u^+_{rms}=f(y^+)$ per la seconda squadra}
+\end{figure}
 
-% Le variabili interne dello strato limite turbolento si definiscono come:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{images/9/sq3p1+_rms.png}
+    \caption{Fluttuazioni adimensionali $u^+_{rms}=f(y^+)$ per la terza squadra}
+\end{figure}
 
-% \begin{equation*}
-%     y^+ = \frac{y}{l_\tau}
-% \end{equation*}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{images/9/sq4p2+_rms.png}
+    \caption{Fluttuazioni adimensionali $u^+_{rms}=f(y^+)$ per la quarta squadra}
+\end{figure}
 
-% \begin{equation*}
-%         l_\tau = \frac{\nu}{u_\tau} \\
-% \end{equation*}
+\noindent Il massimo delle fluttuazioni adimensionali $u^+_{rms}$ si rileva per una coordinata interna $y^+\approx20$, quindi, come previsto dalla teoria, nel buffer layer. Si osserva inoltre dai dati sperimentali che la sonda a filo caldo non ha raggiunto il sottostrato viscoso.
 
-% \begin{equation*}
-%     u_\tau = \frac{\tau _w}{\rho} = U_e \sqrt{\frac{Cf}{2}}
-% \end{equation*}
-% Attraverso il metodo di Clauser è possibile determinare il valore del coefficiente di sforzo d'attrito a parete $C_f = \frac{\tau _w}{\frac{1}{2}\rho U^2_e}$.\\
-% In questo metodo viene sfruttato il log layer per conoscere lo strato interno dello strato limite turbolento e quindi per determinare in modo sommario lo sforzo d'attrito a parete. Infatti nel log layer c'è la possibilità di avere più misurazioni che inoltre sono più accurate.\\
-% Sfruttando quindi la relazione della velocità nel sottostrato logaritmico 
+\subsection{Spettro di potenza}
+Diagrammando la velocità misurata in funzione del tempo in uno strato limite turbolento, si ottiene:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.49\textwidth]{images/9/sq2timeseries.png}
+    \includegraphics[width=.49\textwidth]{images/9/sq3timeseries.png}
+    \caption{Velocità misurata in funzione del tempo $u(t)$ (squadre 2 e 3)}
+\end{figure}
 
-% \begin{equation*}
-%     u^+ = \frac{1}{k}logy^+ + C
-% \end{equation*}
+\noindent L'analisi nel dominio del tempo permette di esaminare aspetti locali o istantanei in un flusso turbolento, ma non permette di catturare la distribuzione energetica tra diverse scale spaziali e temporali, né di identificare chiaramente le frequenze dominanti e le interazioni complesse all'interno del flusso.\\\\
+Un'analisi nel dominio delle frequenze, invece, offre una prospettiva più completa delle caratteristiche spettrali e dinamiche del flusso.\\\\
+Per eseguire un'analisi in frequenza, ogni squadra ha effettuato una misura ad un'elevata frequenza di campionamento (fs = 30 kHz, per la quarta squadra fs = 20 kHz) per un periodo $T$ di un minuto (55 secondi per la squadra 4).\\\\
+Dai segnali di tensione in uscita $E_i$ rilevati dalla sonda a filo caldo si ricavano i valori di velocità $U_i$ utilizzando la legge di King:
+\begin{equation*}
+    U_i = \left( \frac{E_i^2-A}B \right)^{1/n}
+\end{equation*}
+Si prosegue utilizzando il metodo di Welch, una tecnica per stimare la densità spettrale di potenza (PSD) di un segnale. Il metodo di Welch suddivide il segnale originale in segmenti sovrapposti, applica una finestra a ciascun segmento, calcola la trasformata di Fourier e stima la PSD per ciascuna finestra ed infine fa una media per ottenere la stima finale della PSD con una varianza ridotta.\\\\
+Il segnale in questione, relativo agli $N$ valori della velocità misurata $U[i]$, è quindi suddiviso in $K$ segmenti sovrapposti di lunghezza $L$, con una sovrapposizione di $D$ campioni. Il numero di segmenti è dato da:
+\begin{equation*}
+    K = \frac{N-D}{L-D}
+\end{equation*}
+Per ogni indice $k$, dove $k=0,1,...,K-1$, si considera il segmento:
+\begin{equation*}
+    U_k[i] = \left\{U[i+k(L-D)]\right\} \text{ per } i=0,1,...,L-1
+\end{equation*}
+Su ogni segmento si applica una finestra $w[i]$ di lunghezza $L$, ottenendo quindi il segnale finestrato:
+\begin{equation*}
+    U_k^w[i] = U_k[i]w[i]
+\end{equation*}
+Applicare una finestra significa moltiplicare ogni segmento del segnale con una funzione finestra, questo processo è importante per ridurre effetti indesiderati dovuti alla discontinuità ai bordi dei segmenti. In particolare, nel caso in esame è applicata una finestra di Hanning (Hann), caratterizzata da una forma coseno che riduce dolcemente i valori verso zero ai bordi:
+\begin{equation*}
+    w[n] = 0.5\left(1-\cos\left( \frac{2\pi n}{N-1} \right)\right)
+\end{equation*}
+Per ogni segmento finestrato $U_k^w[i]$, si calcola la trasformata di Fourier discreta (DFT):
+\begin{equation*}
+    \hat U_k^w[f] = \sum_{i=0}^{L-1} U_k^w[i]e^{-j2\pi fi/L}
+\end{equation*}
+Dove $f=0,1,...,L-1$ sono gli indici di frequenza.\\\\
+Successivamente, si stima la PSD per ciascun segmento $k$:
+\begin{equation*}
+    P_k[f] = \frac 1L \left| \hat U_k^w[f] \right|^2
+\end{equation*}
+La stima finale della PSD è ottenuta mediando le stime di PSD di ciascun segmento:
+\begin{equation*}
+    P[f] = \frac 1K \sum_{k=0}^{K-1} P_k[f]
+\end{equation*}
+Considerando un numero di punti per segmento pari a $L=N/100$ ed un numero di punti in sovrapposizione pari a $D=L/2$, si ottengono i seguenti diagrammi per le quattro squadre:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.85\textwidth]{images/9/sq1timeserieswelchcl.png}
+    \caption{Densità spettrale di potenza per la prima squadra ($L=N/100$)}
+\end{figure}
 
-% con k = 0.41 (costante di VonKarman) e C = 5.1 (costante di Coles). Utilizzando le relazione di $u^+$ e $y^+$ si ottiene la seguente formulazione:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq2timeserieswelchcl.png}
+    \caption{Densità spettrale di potenza per la seconda squadra ($L=N/100$)}
+\end{figure}
 
-% \begin{equation*}
-%     \frac{u}{U_e} = \sqrt{\frac{Cf}{2}}\left[\frac{1}{k}\left(log\frac{yU_e}{\nu} + log\sqrt{\frac{C_f}{2}}\right) + C\right]
-% \end{equation*}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq3timeserieswelchcl.png}
+    \caption{Densità spettrale di potenza per la terza squadra ($L=N/100$)}
+\end{figure}
 
-% Viene quindi costruita la mappa di Clauser assumendo differenti valori di $C_f$. Sovrapponendo il profilo di velocità sperimentale si osserva quale $C_f$ si avvicina maggiormente ai dati sperimentali.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{images/9/sq4timeserieswelchcl.png}
+    \caption{Densità spettrale di potenza per la quarta squadra ($L=N/100$)}
+\end{figure}
 
-% Si ricava quindi il $C_f = 0.0045$ con il quale si rappresenta l'andamento della velocità e delle fluttuazioni all'interno dello strato limite
+\noindent Questi diagrammi mostrano in modo molto evidente e chiaro la distribuzione energetica dello strato limite turbolento in funzione delle frequenze, tuttavia, dato il basso numero di punti per segmento, alcune frequenze caratteristiche potrebbero non essere evidenti per motivazioni di tipo numerico. Aumentando il numero di punti per segmento a $L=N/4.5$, si ottengono i seguenti diagrammi:
 
-% \begin{equation*}
-%     u^+ = \frac{U}{u_\tau}
-% \end{equation*}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.7\textwidth]{images/9/sq1timeserieswelch.png}
+    \caption{Densità spettrale di potenza per la prima squadra ($L=N/4.5$)}
+\end{figure}
 
-% \begin{equation*}
-%     y^+ = \frac{y}{l_\tau}
-% \end{equation*}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq2timeserieswelch.png}
+    \caption{Densità spettrale di potenza per la seconda squadra ($L=N/4.5$)}
+\end{figure}
 
-% Si ottiene quindi il seguente diagramma per la velocità adimensionale rispetto alla coordinata interna
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/9/sq3timeserieswelch.png}
+    \caption{Densità spettrale di potenza per la terza squadra ($L=N/4.5$)}
+\end{figure}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/9/sq4timeserieswelch.png}
+    \caption{Densità spettrale di potenza per la quarta squadra ($L=N/4.5$)}
+\end{figure}
 
-% Per quanto riguarda le fluttuazioni invece:
-
-% \subsection{Confronto strato limite laminare e turbolento}
-
-% In primo luogo si evidenzia il confronto tra i valori notevoli dello strato limite laminare e turbolento:
-
-
-% Vengono dati anche i grafici di confronto tra gli andamenti dello strato limite laminare e turbolento per la velocità media, le fluttuazioni turbolente e i valori adimensionali.
+\noindent In questi ultimi diagrammi si evidenziano dei picchi nella densità spettrale di potenza corrispondenti a delle frequenze ($f\approx30$ Hz) caratteristiche del sistema. Questi picchi di energia possono essere dovuti a fenomeni di sfilamento vorticoso dei supporti della sonda a filo caldo o del tubo di Pitot all'ingresso della camera di prova.\\\\
+I picchi di energia che invece si osservano a valori di frequenza più alti sono probabilmente dovuti a fenomeni numerici spuri o ad interferenze di tipo elettromagnetico.
