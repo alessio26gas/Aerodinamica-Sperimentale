@@ -1470,7 +1470,7 @@ grid on
 print(q, sprintf('images/FFT%d.png', anno), '-dpng', '-r300');
 
 j = figure();
-Pxx = (1/(Fs*Nx)) * abs(U).^2;
+Pxx = (2/(Fs*Nx)) * abs(U).^2;
 Pxx = Pxx(1:floor(Nx/2)+1);
 loglog(f, Pxx);
 xlabel('f [Hz]')
@@ -1482,7 +1482,7 @@ print(j, sprintf('images/PSD%d.png', anno), '-dpng', '-r300');
 disp("Frequenza di shedding: " + f(ind) + " Hz")
 
 U_inf = mean(abs(u_inf(isfinite(u_inf))));
-disp("Velocità a monte: " + U_inf)
+disp("Velocita' a monte: " + U_inf)
 
 if anno == 220
     D = 0.024;
@@ -1613,7 +1613,7 @@ iy = 17;
 
 var = 0;
 for frame = 1:frames
-    var = var + u_flutt{frame}(iy, ix)^2 + v_flutt{frame}(iy, ix)^2;
+    var = var + (u(frame) - mean(u))^2;
 end
 var = var/frames;
 disp(var)
@@ -1639,5 +1639,4 @@ colormap(jet)
 clb=colorbar;
 title(clb,'\tau_{Re} [N/m^2]')
 print(fig, "images/tauRe.png", '-dpng', '-r300');
-
 \end{lstlisting}
