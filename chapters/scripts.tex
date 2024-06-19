@@ -1328,7 +1328,7 @@ close all
 clear
 clc
 
-filename = "PIV/2022/cilindro_22_600.mat";
+filename = "cilindro22.mat";
 disp("Loading data...")
 load(filename)
 frames = length(u_original);
@@ -1378,7 +1378,7 @@ for frame=1:frames
     clb=colorbar;
     title(clb,'V [m/s]')
     set(streamslice(xf,yf,u,v,0.3),'Color','k')
-    quiver(xf,yf,u/40,v/30, "off", 'Color','k')
+    quiver(xf,yf,u/90,v/90, "off", 'Color','k')
     hold off
 
     drawnow
@@ -1438,7 +1438,7 @@ else
 end
 load(filename)
 frames = length(u_original);
-%%
+
 u = zeros(frames, 1);
 u_inf = zeros(frames, 1);
 
@@ -1496,7 +1496,7 @@ St = f(ind) * D / U_inf;
 disp("Numero di Reynolds: " + Re)
 disp("Numero di Strouhal: " + St)
 
-%%
+%% Avvia animazione
 h = figure();
 box on
 xlabel("x [m]")
@@ -1510,32 +1510,13 @@ set(h, "Position", [left, bottom, frameWidth, frameHeight]);
 disp("Playing animation...")
 movie(M, 10, fps);
 
-%%
-close all
-clear
-clc
-
-load("exported.mat")
-load("exportedemp.mat")
-L10emp(end,1) = 1400; 
-z = figure();
-hold on
-plot(L10emp(:,1), L10emp(:,2))
-plot(L10(:,1), L10(:,2), ".", 'MarkerSize', 15)
-plot([1224 1296], [0.185 0.215], "k.", 'MarkerSize', 20)
-legend("Relazioni empiriche", "Risultati E10", "Risultati PIV", 'Location', 'southeast')
-xlabel("Reynolds")
-ylabel("Strouhal")
-grid on
-print(z, "images/Re-St.png", '-dpng', '-r300');
-
 %% Campo istantaneo
 frame = 326;
-u = u_original{frame};
-v = v_original{frame};
+uist = u_original{frame};
+vist = v_original{frame};
 xf = x{frame};
 yf = y{frame};
-Vmag = sqrt(u.^2+v.^2);
+Vmag = sqrt(uist.^2+vist.^2);
 
 hh = figure();
 set(hh, "Position", [left, bottom, frameWidth, frameHeight]);
@@ -1546,48 +1527,10 @@ axis([x_min x_max y_min y_max]);
 colormap(jet)
 clb=colorbar;
 title(clb,'V [m/s]')
-quiver(xf,yf,u, v, 'Color','k')
-print(hh, sprintf('images/f300_22b.png', anno), '-dpng', '-r300');
+quiver(xf,yf,uist, vist, 'Color','k')
+print(hh, sprintf('images/f300_%b.png', anno), '-dpng', '-r300');
 
-%% Campo Medio
-close all
-clear
-clc
-
-load("cilindro22.mat")
-
-[nr, nc] = size(u_original{1});
-
-uavg = zeros(nr, nc);
-vavg = zeros(nr, nc);
-
-for frame = 1:frames
-    uavg = uavg + u_original{frame};
-    vavg = vavg + v_original{frame};
-end
-
-uavg = uavg/frames;
-vavg = vavg/frames;
-Vmag = sqrt(uavg.^2+vavg.^2);
-
-fig = figure();
-set(fig, "Position", [left, bottom, frameWidth, frameHeight]);
-imagesc(xf(1,:),yf(:,1),Vmag,'Interpolation','bilinear');
-hold on
-axis([x_min x_max y_min y_max]);
-colormap(jet)
-clb=colorbar;
-title(clb,'v [m/s]')
-quiver(xf,yf,u, v, 'Color','k')
-print(fig, "images/vmean.png", '-dpng', '-r300');
-
-%% Fluttuazioni
-close all
-clear
-clc
-
-load("cilindro22.mat")
-%%
+%% Campo medio e fluttuazioni
 [nr, nc] = size(u_original{1});
 
 uavg = zeros(nr, nc);
@@ -1616,10 +1559,9 @@ for frame = 1:frames
     var = var + (u(frame) - mean(u))^2;
 end
 var = var/frames;
-disp(var)
-
-PARSIVAL = 2*trapz(linspace(0,30,300), Pxx);
-disp(PARSIVAL) 
+pars = 2*trapz(linspace(0,30,300), Pxx);
+disp("Varianza: " + var + " m2/s2")
+disp("Integrale dello spettro di potenza: " + pars + " J/kgs")
 
 rho = 1000;
 tauRe = u_original;
@@ -1639,4 +1581,23 @@ colormap(jet)
 clb=colorbar;
 title(clb,'\tau_{Re} [N/m^2]')
 print(fig, "images/tauRe.png", '-dpng', '-r300');
+
+%% Confronto Reynolds-Strouhal
+close all
+clear
+clc
+
+load("exported.mat")
+load("exportedemp.mat")
+L10emp(end,1) = 1400; 
+z = figure();
+hold on
+plot(L10emp(:,1), L10emp(:,2))
+plot(L10(:,1), L10(:,2), ".", 'MarkerSize', 15)
+plot([1224 1296], [0.185 0.215], "k.", 'MarkerSize', 20)
+legend("Relazioni empiriche", "Risultati E10", "Risultati PIV", 'Location', 'southeast')
+xlabel("Reynolds")
+ylabel("Strouhal")
+grid on
+print(z, "images/Re-St.png", '-dpng', '-r300');
 \end{lstlisting}
