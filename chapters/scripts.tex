@@ -1470,7 +1470,7 @@ grid on
 print(q, sprintf('images/FFT%d.png', anno), '-dpng', '-r300');
 
 j = figure();
-Pxx = (2/(Fs*Nx)) * abs(U).^2;
+Pxx = (1/(Fs*Nx)) * abs(U).^2;
 Pxx = Pxx(1:floor(Nx/2)+1);
 loglog(f, Pxx);
 xlabel('f [Hz]')
@@ -1618,7 +1618,7 @@ end
 var = var/frames;
 disp(var)
 
-PARSIVAL = trapz(linspace(0,30,300), Pxx);
+PARSIVAL = 2*trapz(linspace(0,30,300), Pxx);
 disp(PARSIVAL) 
 
 rho = 1000;
