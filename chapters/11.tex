@@ -115,26 +115,140 @@ Il toolbox PIVlab comprende gli algoritmi numerici della PIV con cui si può val
 \newpage
 \subsection{Analisi dati}
 L'analisi dati per la presente attività è condotta con l'ausilio di alcuni codici in Matlab, riportati in appendice \ref{b11}.\\\\
-% CITARE ANIMAZIONI E PROCEDURA DI ACQUISIZIONE FOTOGRAMMI
+I file \texttt{.mat} esportati da PIVlab contengono i campi di velocità per ciascun fotogramma dei video analizzati. Utilizzando un codice Matlab, è possibile generare delle animazioni che mostrano il campo di velocità, con una scala di colori per rappresentare l'intensità e delle frecce per indicare la direzione del flusso.\\\\
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=.52\textwidth]{images/11/f300_22b.png}
+    \includegraphics[height=.5\textwidth]{images/11/f300_220.png}
+    \caption{Campo istantaneo di velocità (cilindro e placca 2022)}
+\end{figure}
 
-% CAMPO ISTANTANEO VELOCITA', CONFRONTO CON FOTOGRAMMA VIDEO (CIL 22, PLA 22)
-% CAMPO ISTANTANEO VORTICITA' (CIL 22, PLA 22)
+\noindent Il campo di velocità non è calcolato in tutti i pixel del video, bensì solo in una regione di interesse (ROI). Si può pensare di sovrapporre il campo di velocità ottenuto da PIVlab ai fotogrammi dei video utilizzati:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/11/overlapped.png}
+    \includegraphics[width=\textwidth]{images/11/overlap_220.png}
+    \caption{Campi istantanei di velocità sovrapposti ai fotogrammi dei video}
+\end{figure}
 
-% CALCOLO DEL CAMPO MEDIO DI VELOCITA' (CIL 22, PLA 22)
-% CALCOLO DEL CAMPO MEDIO DI VORTICITA' (CIL 22, PLA 22)
-% COMMETARE VALORI MASSIMI, ACCELERAZIONE NEL CONVERGENTE ED EVENTUALI VORTICI
+\noindent Si osserva come il flusso aumenta di velocità, ciò è dovuto alla geometria convergente del canale idrodinamico. Si osserva inoltre molto chiaramente lo sfilamento vorticoso.\\\\
+Mediando i campi di velocità di tutti i fotogrammi, si ottiene il seguente diagramma:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.92\textwidth]{images/11/mean.png}
+    \caption{Campo medio di velocità (cilindro 2022)}
+\end{figure}
+
+\noindent Si può pensare di mediare solo le componenti longitudinali $u$ e trasversali $v$ al condotto:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.92\textwidth]{images/11/Umean.png}
+    \caption{Componente longitudinale della velocità media $u$ (cilindro 2022)}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.8\textwidth]{images/11/vmean.png}
+    \caption{Componente trasversale della velocità media $v$ (cilindro 2022)}
+\end{figure}
 
 % DISCUTERE EVOLUZIONE DELLA VELOCITA' IN UN PUNTO FISSO (CIL 22, PLA 22)
-% SPIEGARE PERCHÈ WELCH NON VA BENE
-% TRASFORMATA DI FOURIER DISCRETA E SPETTRO DI POTENZA (CIL 22, PLA 22)
-% CALCOLO DELLA FREQUENZA DI SHEDDING
-% STIMA DELLA VELOCITA' A MONTE
+\noindent Per studiare il vortex shedding si può tracciare un diagramma della velocità in un punto fisso nello spazio, in corrispondenza dei vortici che si generano. Si ottengono quindi i seguenti risultati:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.46\textwidth]{images/11/timeseries22.png}
+    \includegraphics[width=.46\textwidth]{images/11/timeseries23.png}
+    \includegraphics[width=.46\textwidth]{images/11/timeseries220.png}
+    \caption{Velocità in un punto (cilindro 2022, cilindro 2023, placca 2022)}
+\end{figure}
 
-% CALCOLO DEL NUMERO DI REYNOLDS E DEL NUMERO DI STROUHAL (CIL 22, CIL 23, PLA 22)
-    % CILINDRO 22
-        % Re = 1296 St = 0.215 fs = 2.60 Hz Uinf = 0.121 m/s
-    % CILINDRO 23
-        % Re = 1225 St = 0.185 fs = 2.10 Hz Uinf = 0.114 m/s
-    % PLACCA 22
-        % Re = 2331 St = 0.239 fs = 0.9 Hz Uinf = 0.090 m/s
-% CONFRONTARE RISULTATI CON ESERCITAZIONE 10 (CIL 22, CIL 23)
+\noindent Dai diagrammi nel dominio del tempo si evince la presenza di una frequenza dominante, che caratterizza lo sfilamento vorticoso. Una rappresentazione più efficace può essere fatta sfruttando lo spettro di potenza.\\\\
+Questa volta, però, il metodo di Welch non è una soluzione efficiente, in quanto il numero di frame acquisiti (600) è troppo basso per ottenere una stima accurata dello spettro di potenza utilizzando questo approccio. La frequenza di campionamento delle immagini (pari a $f_{samp}=60$ Hz) comporta, secondo il teorema di Nyquist, una massima frequenza rilevabile di 30 Hz. Tuttavia, dato che il segnale non presenta rumore significativo, è più efficiente utilizzare direttamente la FFT (Fast Fourier Transform):
+\begin{equation*}
+    \hat u(f) = \Delta t_{samp} \sum_{i=1}^{N_{frames}} u_i e^{-j2\pi f_i \Delta t_{samp}}
+\end{equation*}
+La FFT fornisce una rappresentazione spettrale accurata senza la necessità di segmentazione e sovrapposizione dei dati come nel metodo di Welch, risultando in un'analisi più semplice e diretta delle frequenze presenti.\\\\
+Applicando la FFT ai segnali, si ottiene:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.49\textwidth]{images/11/FFT22.png}
+    \includegraphics[width=.49\textwidth]{images/11/FFT23.png}
+    \includegraphics[width=.49\textwidth]{images/11/FFT220.png}
+    \caption{Trasformata di Fourier (cilindro 2022, cilindro 2023, placca 2022)}
+\end{figure}
+
+\noindent Per ricavare lo spettro di potenza dai risultati della FFT, si calcola il modulo al quadrato e si normalizza rispetto al numero di fotogrammi $N_{frames}$:
+\begin{equation*}
+    P(f) = \left| \frac{\hat u(f)}{N_{frames}} \right|^2
+\end{equation*}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.49\textwidth]{images/11/PSD22.png}
+    \includegraphics[width=.49\textwidth]{images/11/PSD23.png}
+    \includegraphics[width=.55\textwidth]{images/11/PSD220.png}
+    \caption{Spettro di potenza (cilindro 2022, cilindro 2023, placca 2022)}
+\end{figure}
+
+\noindent Dallo spettro di potenza si ricava la frequenza di shedding $f_s$, inoltre, si può stimare la velocità a monte del flusso $U_\infty$ da un punto non influenzato dai vortici. Si ottiene:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|}
+    \hline
+    Caso          & $f_s$   & $U_\infty$ \\ \hline
+    Cilindro 2022 & 2.60 Hz & 0.121 m/s  \\ \hline
+    Cilindro 2023 & 2.10 Hz & 0.114 m/s  \\ \hline
+    Placca 2022   & 0.90 Hz & 0.090 m/s  \\ \hline
+    \end{tabular}
+\end{table}
+
+\noindent Dal valore di velocità a monte si ricava il numero di Reynolds:
+\begin{equation*}
+    Re = \frac{U_\infty D}{\nu_{H_2O} }
+\end{equation*}
+Dove $D$ rappresenta una lunghezza caratteristica del corpo esaminato (diametro per il cilindro o lunghezza per la placca piana), mentre $\nu_{H_2O}$ è la viscosità cinematica dell'acqua ($\nu_{H_2O}\approx 9.31\cdot10^{-7}$ m$^2$/s). Con la frequenza di shedding $f_s$ si ricava invece il numero di Strouhal:
+\begin{equation*}
+    St = \frac{f_s D}{U_\infty}
+\end{equation*}
+Si ottengono i seguenti risultati:
+\begin{table}[H]
+    \centering
+    \begin{tabular}{|c|c|c|c|c|}
+    \hline
+    Caso          & $f_s$   & $U_\infty$ & Reynolds & Strouhal \\ \hline
+    Cilindro 2022 & 2.60 Hz & 0.121 m/s  & 1296     & 0.215    \\ \hline
+    Cilindro 2023 & 2.10 Hz & 0.114 m/s  & 1225     & 0.185    \\ \hline
+    Placca 2022   & 0.90 Hz & 0.090 m/s  & 2331     & 0.239    \\ \hline
+    \end{tabular}
+\end{table}
+
+\noindent Nel caso del cilindro, si possono confrontare i risultati ottenuti con il diagramma Reynolds-Strouhal dell'attività precedente:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.75\textwidth]{images/11/Re-St.png}
+    \caption{Diagramma Reynolds-Strouhal}
+\end{figure}
+
+\noindent Il flusso che si sviluppa non risulta essere quello canonico 2D per via della sua dimensione finita che appoggia sulla parete inferiore della camera di prova. Inoltre, il piano di misura è a un diametro di distanza dal fondo, dove si sviluppa il vortice a ferro di cavallo (horseshoe vortex) e sono presenti effetti tridimensionali dovuti all'induzione del vortice. Per questi motivi i casi da studiare differiscono dai flussi canonici bidimensionali, pertanto, l'andamento Reynolds-Strouhal si discosta leggermente da quello studiato per il cilindro 2D utilizzando l'anemometria a filo caldo.
+\newpage
+\noindent Si procede al calcolo delle fluttuazioni di velocità sottraendo in ogni punto la velocità media temporale:
+\begin{equation*}
+    u^\prime(t) = u(t) - \overline u \qquad v^\prime(t) = v(t) - \overline v  
+\end{equation*}
+Dalle fluttuazioni si può ricavare la varianza:
+\begin{equation*}
+    \text{var}(\vec V) = \overline{{V^\prime}^2} = \frac 1{N_{frames}} \sum (u^\prime + v^\prime)
+\end{equation*}
+Che per il teorema di Parisval sulla conservazione dell'energia, risulta pari a:
+\begin{equation*}
+    \overline{{V^\prime}^2} = \int_0^{\frac{f_{samp}}2} P(f) df
+\end{equation*}
+Dal campo di fluttuazioni di velocità si possono inoltre ricavare gli sforzi di Reynolds:
+\begin{equation*}
+    \tau_{Re} = -\rho \overline{u^\prime v^\prime}
+\end{equation*}
+Si ottiene quindi il seguente diagramma:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{images/11/tauRe.png}
+    \caption{Sforzi di Reynolds (cilindro 2022)}
+\end{figure}
