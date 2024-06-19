@@ -8,7 +8,7 @@ La presente esercitazione si pone come obiettivo la taratura di una sonda a filo
 
 \subsection{Descrizione dell'esperimento}
 L'anemometria è lo studio dei metodi e delle tecniche necessarie per la misura di velocità nei flussi. In particolare, l'anemometria a filo caldo si basa sullo scambio termico convettivo tra un elemento sensibile riscaldato e il flusso che lo investe, del quale si vuole misurare la velocità istantanea. Le sonde a filo caldo hanno una bassissima intrusività ed un'elevata risposta in frequenza (si arriva fino alle centinaia di kHz), queste due caratteristiche rendono la tecnica dell'anemometria a filo caldo adatta a misure di velocità dei flussi turbolenti.\\\\
-L'anemometria a filo caldo non è una tecnica assoluta, pertanto la sonda necessita di taratura. Una sonda a filo caldo necessità di taratura anche diverse volte nel corso di una giornata, questo perché la curva di taratura è dipendente dalla temperatura.\\\\
+L'anemometria a filo caldo non è una tecnica assoluta, pertanto la sonda necessita di taratura. Una sonda a filo caldo necessita di taratura anche diverse volte nel corso di una giornata, questo perché la curva di taratura è dipendente dalla temperatura.\\\\
 L'elemento sensibile di un anemometro a filo caldo consiste in un filo metallico di diametro estremamente piccolo ($d=5\mu m$), di lunghezza dell'ordine del millimetro, mantenuto caldo per effetto Joule dall'attraversamento di una corrente elettrica.\\\\
 Il sensore caldo (hot wire) ad una certa temperatura superiore a quella del fluido viene raffreddato dalla corrente che lo investe provocando una variazione di temperatura del sensore e conseguentemente una variazione della resistenza elettrica del sensore stesso. Ad una variazione di velocità corrisponde quindi una differenza di potenziale ai capi di una diagonale di un ponte di Wheatstone, di cui la sonda fa parte come uno dei quattro rami.\\\\
 Si consideri un elemento cilindrico metallico infinitamente lungo, percorso da corrente elettrica ed immerso in un flusso gassoso uniforme. La quantità di calore scambiata tra il filo e la corrente fluida dipende da:
@@ -69,7 +69,7 @@ Il salto di temperatura si esprime quindi come:
 \begin{equation*}
     T_w - T_f = \frac{R_w - R_f}{bR_f}
 \end{equation*}
-Sostituendo nel bilancio termico termico si ottiene:
+Sostituendo nel bilancio termico si ottiene:
 \begin{equation*}
     I^2 R_w = \pi l k_f Nu \frac{R_w - R_f}{bR_f}
 \end{equation*}
@@ -119,7 +119,7 @@ Come primo passo si misurano la pressione e la temperatura ambiente, dalle quali
 \begin{equation*}
     \rho = \frac{p_{amb}}{RT_{amb}} \qquad \mu = 1.46\cdot10^{-6} \frac{T_{amb}^{3/2}}{T_{amb}+110} 
 \end{equation*}
-Successivamente è necessario bilanciare il ponte di Wheatstone della sonda. La tensione di bilanciamento deve essere tale da avere una differennza di potenziale nulla ai capi della sonda a filo caldo.\\\\
+Successivamente è necessario bilanciare il ponte di Wheatstone della sonda. La tensione di bilanciamento deve essere tale da avere una differenza di potenziale nulla ai capi della sonda a filo caldo.\\\\
 Per ogni velocità $U$ del flusso in galleria del vento, una volta esauriti eventuali fenomeni transitori, sono effettuate due letture: una per il segnale di tensione in uscita dalla sonda filo caldo $E_{HW}$ ed un'altra relativa al segnale di tensione in uscita dal trasduttore di pressione collegato al tubo di Pitot $E_t$.\\\\
 La sonda a filo caldo lavora a temperatura costante ed è posta perpendicolarmente alla corrente, si parla quindi di taratura in velocità (angoli $\alpha$ e $\beta$ nulli).\\\\
 I dati grezzi misurati con la procedura appena descritta sono riportati nelle tabelle in appendice \ref{a8}.

@@ -55,7 +55,7 @@ E la lunghezza di attrito:
 \begin{equation*}
     l_\tau = \frac{\nu}{u_\tau}
 \end{equation*}
-Se la velocità $u(y)$ si adimensionalizza rispetto alla velocità di attrito $u_\tau$ e la distanza da parete $y$ rispetto alla lunghezza di attrito $l_\tau$, la distribuzione di velocità si può presentare nella forma adimensionale più appropriata per lo studio dello strato limte turbolento, ovvero si esprime $u^+ = f(y^+)$. Le nuove variabili sono quindi definite come:
+Se la velocità $u(y)$ si adimensionalizza rispetto alla velocità di attrito $u_\tau$ e la distanza da parete $y$ rispetto alla lunghezza di attrito $l_\tau$, la distribuzione di velocità si può presentare nella forma adimensionale più appropriata per lo studio dello strato limite turbolento, ovvero si esprime $u^+ = f(y^+)$. Le nuove variabili sono quindi definite come:
 \begin{equation*}
     y^+ = \frac{y}{l_\tau} \qquad u^+ = \frac{u}{u_\tau}
 \end{equation*}
@@ -134,7 +134,7 @@ Prima di azionare la galleria del vento, è bene misurare la tensione di offset 
     E^2 = A + BU^n \qquad A = E_0^2
 \end{equation*}
 Come costanti $B$ ed $n$ si utilizzano quelle ricavate durante l'attivita precedente.\\\\
-La prima posizione della sonda è ad approssimativamente mezzo millimetro di distanza $y$ dalla placca piana. In questa posizione si acquisiscono i dati di tensione in uscita dall'anemometro ad una determinata frequenza di campionamento $f_s=200$ Hz per un periodo $T=30$ s.\\\\
+La prima posizione della sonda è approssimativamente a mezzo millimetro di distanza $y$ dalla placca piana. In questa posizione si acquisiscono i dati di tensione in uscita dall'anemometro ad una determinata frequenza di campionamento $f_s=200$ Hz per un periodo $T=30$ s.\\\\
 La sonda non può avvicinarsi troppo alla placca, perché in caso di contatto, questa potrebbe rompersi. Inoltre, poiché il supporto che tiene la sonda non è infinitamente rigido, il flusso d'aria della galleria ne induce delle vibrazioni, che fanno oscillare la sonda a filo caldo. Se la sonda è troppo vicina alla placca, le oscillazioni possono indurre un contatto e quindi portare al danneggiamento della sonda.\\\\
 Una volta acquisiti i primi dati, mediante il sistema di azionamento del motore passo-passo, si aumenta con precisione la distanza della sonda a filo caldo dalla placca piana $y$ e si acquisiscono nuovamente i dati.\\\\
 Per ogni configurazione si ottengono quindi $N = f_s\cdot T$ dati campionati ad ogni distanza $y$ considerata.\\\\
@@ -180,7 +180,7 @@ Poiché si dispone di dati discreti, per gli integrali si utilizza la regola dei
 \begin{equation*}
     \int_a^b f(x)dx \approx \sum_{k=1}^n \frac{f(x_{k-1}) + f(x_k)}2 \Delta x_k \quad \text{con } \Delta x_k = x_k - x_{k-1}
 \end{equation*}
-Per metodo più immmediato per determinare se lo strato limite analizzato è laminare, transizionale o turbolento, è il calcolod del numero di Reynolds locale $Re_x$, relativo alla coordinata $x$, se questo è maggiore del numero di Reynolds critico ($Re_{cr}\approx500000$) allora lo strato limite è laminare, altrimenti è turbolento:
+Il metodo più immediato per determinare se lo strato limite analizzato è laminare, transizionale o turbolento, è il calcolo del numero di Reynolds locale $Re_x$, relativo alla coordinata $x$, se questo è maggiore del numero di Reynolds critico ($Re_{cr}\approx500000$) allora lo strato limite è laminare, altrimenti è turbolento:
 \begin{equation*}
     Re_x = \frac{U_\infty x}\nu
 \end{equation*}
