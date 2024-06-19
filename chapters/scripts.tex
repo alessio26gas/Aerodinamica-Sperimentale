@@ -1405,243 +1405,239 @@ movie(M, 10, fps);
 \end{lstlisting}
 
 \begin{lstlisting}[style=Matlab-editor, basicstyle=\ttfamily\footnotesize]
-    close all
-    clear
-    
-    anno = 222;
-    
-    disp("Loading data...")
-    if anno == 22
-        filename = "PIV/2022/cilindro_22_600.mat";
-        ix = 14;
-        iy = 17;
-        ix_inf = 16; 
-        iy_inf = 17; 
-    elseif anno == 23
-        filename = "PIV/2023/cilindro_23_600.mat";
-        ix = 20; 
-        iy = 11; 
-        ix_inf = 26;
-        iy_inf = 5;
-    elseif anno == 222
-        filename = "cilindro22.mat";
-        ix = 14;
-        iy = 17;
-        ix_inf = 16; 
-        iy_inf = 17; 
-    else
-        filename = "PIV/2022/placca_22_600.mat";
-        ix = 14;
-        iy = 17;
-        ix_inf = 3; 
-        iy_inf = 3; 
-    end
-    load(filename)
-    frames = length(u_original);
-    %%
-    u = zeros(frames, 1);
-    u_inf = zeros(frames, 1);
-    
-    for frame=1:frames
-        if anno == 23
-            u_inf(frame) = v_original{frame}(iy_inf, ix_inf);
-        else
-            u_inf(frame) = u_original{frame}(iy_inf, ix_inf);
-        end
-        u(frame) = v_original{frame}(iy, ix) + u_original{frame}(iy, ix);
-    end
-    
-    k = figure();
-    plot(linspace(0, frames/fps, frames), u)
-    xlabel("t [s]")
-    ylabel("u [m/s]")
-    grid minor
-    print(k, sprintf('images/timeseries%d.png', anno), '-dpng', '-r300');
-    
-    Fs = fps;
-    Nx = length(u);
-    f = (0:floor(Nx/2)) * (Fs/Nx);
-    
-    q = figure();
-    U = fft(u - mean(u));
-    hold on
-    loglog(f, abs(real(U(1:floor(Nx/2)+1))));
-    loglog(f, abs(imag(U(1:floor(Nx/2)+1))));
-    legend("Parte reale", "Parte immaginaria")
-    xlabel('f [Hz]')
-    ylabel('Fast Fourier Transform [m/s]')
-    grid on
-    print(q, sprintf('images/FFT%d.png', anno), '-dpng', '-r300');
-    
-    j = figure();
-    Pxx = (1/(Fs*Nx)) * abs(U).^2;
-    Pxx = Pxx(1:floor(Nx/2)+1);
-    loglog(f, Pxx);
-    xlabel('f [Hz]')
-    ylabel('Power Spectral Density (PSD) [J/kg]')
-    grid on
-    print(j, sprintf('images/PSD%d.png', anno), '-dpng', '-r300');
-    
-    [pxxmax, ind] = max(Pxx);
-    disp("Frequenza di shedding: " + f(ind) + " Hz")
-    
-    U_inf = mean(abs(u_inf(isfinite(u_inf))));
-    disp("Velocità a monte: " + U_inf)
-    
-    if anno == 220
-        D = 0.024;
-    else
-        D = 0.01;
-    end
-    nu_w = 0.000931 / 1000;
-    Re = U_inf * D / nu_w;
-    St = f(ind) * D / U_inf;
-    
-    disp("Numero di Reynolds: " + Re)
-    disp("Numero di Strouhal: " + St)
-    
-    %%
-    h = figure();
-    box on
-    xlabel("x [m]")
-    ylabel("y [m]")
-    clim([0 V_max*0.7])
-    axis([x_min x_max y_min y_max]);
-    colormap(jet)
-    clb=colorbar;
-    title(clb,'V [m/s]')
-    set(h, "Position", [left, bottom, frameWidth, frameHeight]);
-    disp("Playing animation...")
-    movie(M, 10, fps);
-    
-    %%
-    close all
-    clear
-    clc
-    
-    load("exported.mat")
-    load("exportedemp.mat")
-    L10emp(end,1) = 1400; 
-    z = figure();
-    hold on
-    plot(L10emp(:,1), L10emp(:,2))
-    plot(L10(:,1), L10(:,2), ".", 'MarkerSize', 15)
-    plot([1224 1296], [0.185 0.215], "k.", 'MarkerSize', 20)
-    legend("Relazioni empiriche", "Risultati E10", "Risultati PIV", 'Location', 'southeast')
-    xlabel("Reynolds")
-    ylabel("Strouhal")
-    grid on
-    print(z, "images/Re-St.png", '-dpng', '-r300');
-    
-    %% Campo istantaneo
-    frame = 326;
-    u = u_original{frame};
-    v = v_original{frame};
-    xf = x{frame};
-    yf = y{frame};
-    Vmag = sqrt(u.^2+v.^2);
-    
-    hh = figure();
-    set(hh, "Position", [left, bottom, frameWidth, frameHeight]);
-    imagesc(xf(1,:),yf(:,1),Vmag,'Interpolation','bilinear');
-    hold on
-    % clim([0 max(Vmag)])
-    axis([x_min x_max y_min y_max]);
-    colormap(jet)
-    clb=colorbar;
-    title(clb,'V [m/s]')
-    quiver(xf,yf,u, v, 'Color','k')
-    print(hh, sprintf('images/f300_22b.png', anno), '-dpng', '-r300');
-    
-    %% Campo Medio
-    close all
-    clear
-    clc
-    
-    load("cilindro22.mat")
-    
-    [nr, nc] = size(u_original{1});
-    
-    uavg = zeros(nr, nc);
-    vavg = zeros(nr, nc);
-    
-    for frame = 1:frames
-        uavg = uavg + u_original{frame};
-        vavg = vavg + v_original{frame};
-    end
-    
-    uavg = uavg/frames;
-    vavg = vavg/frames;
-    Vmag = sqrt(uavg.^2+vavg.^2);
-    
-    fig = figure();
-    set(fig, "Position", [left, bottom, frameWidth, frameHeight]);
-    imagesc(xf(1,:),yf(:,1),Vmag,'Interpolation','bilinear');
-    hold on
-    axis([x_min x_max y_min y_max]);
-    colormap(jet)
-    clb=colorbar;
-    title(clb,'v [m/s]')
-    quiver(xf,yf,u, v, 'Color','k')
-    print(fig, "images/vmean.png", '-dpng', '-r300');
-    
-    %% Fluttuazioni (?)
-    close all
-    clear
-    clc
-    
-    load("cilindro22.mat")
-    %%
-    [nr, nc] = size(u_original{1});
-    
-    uavg = zeros(nr, nc);
-    vavg = zeros(nr, nc);
-    
-    for frame = 1:frames
-        uavg = uavg + u_original{frame};
-        vavg = vavg + v_original{frame};
-    end
-    
-    uavg = uavg/frames;
-    vavg = vavg/frames;
-    
-    u_flutt = u_original;
-    v_flutt = v_original;
-    for frame = 1:frames
-        u_flutt{frame} = u_original{frame} - uavg;
-        v_flutt{frame} = v_original{frame} - vavg;
-    end
-    
+close all
+clear
+
+anno = 222;
+
+disp("Loading data...")
+if anno == 22
+    filename = "PIV/2022/cilindro_22_600.mat";
     ix = 14;
     iy = 17;
-    
-    var = 0;
-    for frame = 1:frames
-        var = var + u_flutt{frame}(iy, ix)^2 + v_flutt{frame}(iy, ix)^2;
-    end
-    var = var/frames;
-    disp(var)
-    
-    PARSIVAL = trapz(linspace(0,30,300), Pxx);
-    disp(PARSIVAL) 
-    
-    rho = 1000;
-    tauRe = u_original;
-    TAURE = zeros(nr, nc);
-    for frame = 1:frames
-        tauRe{frame} = -rho .* u_flutt{frame}.^2 .* v_flutt{frame}.^2;
-        TAURE = TAURE + tauRe{frame};
-    end
-    TAURE = TAURE/frames;
-    
-    fig = figure();
-    set(fig, "Position", [left, bottom, frameWidth, frameHeight]);
-    imagesc(xf(1,:),yf(:,1),TAURE,'Interpolation','bilinear');
-    hold on
-    axis([x_min x_max y_min y_max]);
-    colormap(jet)
-    clb=colorbar;
-    title(clb,'\tau_{Re} [N/m^2]')
-    print(fig, "images/tauRe.png", '-dpng', '-r300');
-    
+    ix_inf = 16; 
+    iy_inf = 17; 
+elseif anno == 23
+    filename = "PIV/2023/cilindro_23_600.mat";
+    ix = 20; 
+    iy = 11; 
+    ix_inf = 26;
+    iy_inf = 5;
+elseif anno == 222
+    filename = "cilindro22.mat";
+    ix = 14;
+    iy = 17;
+    ix_inf = 16; 
+    iy_inf = 17; 
+else
+    filename = "PIV/2022/placca_22_600.mat";
+    ix = 14;
+    iy = 17;
+    ix_inf = 3; 
+    iy_inf = 3; 
+end
+load(filename)
+frames = length(u_original);
+%%
+u = zeros(frames, 1);
+u_inf = zeros(frames, 1);
+
+for frame=1:frames
+    u_inf(frame) = sqrt(u_original{frame}(iy_inf, ix_inf)^2 + v_original{frame}(iy_inf, ix_inf)^2);
+    u(frame) = sqrt(v_original{frame}(iy, ix)^2 + u_original{frame}(iy, ix)^2);
+end
+
+k = figure();
+plot(linspace(0, frames/fps, frames), u)
+xlabel("t [s]")
+ylabel("u [m/s]")
+grid minor
+print(k, sprintf('images/timeseries%d.png', anno), '-dpng', '-r300');
+
+Fs = fps;
+Nx = length(u);
+f = (0:floor(Nx/2)) * (Fs/Nx);
+
+q = figure();
+U = fft(u - mean(u));
+hold on
+loglog(f, abs(real(U(1:floor(Nx/2)+1))));
+loglog(f, abs(imag(U(1:floor(Nx/2)+1))));
+legend("Parte reale", "Parte immaginaria")
+xlabel('f [Hz]')
+ylabel('Fast Fourier Transform [m/s]')
+grid on
+print(q, sprintf('images/FFT%d.png', anno), '-dpng', '-r300');
+
+j = figure();
+Pxx = (1/(Fs*Nx)) * abs(U).^2;
+Pxx = Pxx(1:floor(Nx/2)+1);
+loglog(f, Pxx);
+xlabel('f [Hz]')
+ylabel('Power Spectral Density (PSD) [J/kg]')
+grid on
+print(j, sprintf('images/PSD%d.png', anno), '-dpng', '-r300');
+
+[pxxmax, ind] = max(Pxx);
+disp("Frequenza di shedding: " + f(ind) + " Hz")
+
+U_inf = mean(abs(u_inf(isfinite(u_inf))));
+disp("Velocità a monte: " + U_inf)
+
+if anno == 220
+    D = 0.024;
+else
+    D = 0.01;
+end
+nu_w = 0.000931 / 1000;
+Re = U_inf * D / nu_w;
+St = f(ind) * D / U_inf;
+
+disp("Numero di Reynolds: " + Re)
+disp("Numero di Strouhal: " + St)
+
+%%
+h = figure();
+box on
+xlabel("x [m]")
+ylabel("y [m]")
+clim([0 V_max*0.7])
+axis([x_min x_max y_min y_max]);
+colormap(jet)
+clb=colorbar;
+title(clb,'V [m/s]')
+set(h, "Position", [left, bottom, frameWidth, frameHeight]);
+disp("Playing animation...")
+movie(M, 10, fps);
+
+%%
+close all
+clear
+clc
+
+load("exported.mat")
+load("exportedemp.mat")
+L10emp(end,1) = 1400; 
+z = figure();
+hold on
+plot(L10emp(:,1), L10emp(:,2))
+plot(L10(:,1), L10(:,2), ".", 'MarkerSize', 15)
+plot([1224 1296], [0.185 0.215], "k.", 'MarkerSize', 20)
+legend("Relazioni empiriche", "Risultati E10", "Risultati PIV", 'Location', 'southeast')
+xlabel("Reynolds")
+ylabel("Strouhal")
+grid on
+print(z, "images/Re-St.png", '-dpng', '-r300');
+
+%% Campo istantaneo
+frame = 326;
+u = u_original{frame};
+v = v_original{frame};
+xf = x{frame};
+yf = y{frame};
+Vmag = sqrt(u.^2+v.^2);
+
+hh = figure();
+set(hh, "Position", [left, bottom, frameWidth, frameHeight]);
+imagesc(xf(1,:),yf(:,1),Vmag,'Interpolation','bilinear');
+hold on
+% clim([0 max(Vmag)])
+axis([x_min x_max y_min y_max]);
+colormap(jet)
+clb=colorbar;
+title(clb,'V [m/s]')
+quiver(xf,yf,u, v, 'Color','k')
+print(hh, sprintf('images/f300_22b.png', anno), '-dpng', '-r300');
+
+%% Campo Medio
+close all
+clear
+clc
+
+load("cilindro22.mat")
+
+[nr, nc] = size(u_original{1});
+
+uavg = zeros(nr, nc);
+vavg = zeros(nr, nc);
+
+for frame = 1:frames
+    uavg = uavg + u_original{frame};
+    vavg = vavg + v_original{frame};
+end
+
+uavg = uavg/frames;
+vavg = vavg/frames;
+Vmag = sqrt(uavg.^2+vavg.^2);
+
+fig = figure();
+set(fig, "Position", [left, bottom, frameWidth, frameHeight]);
+imagesc(xf(1,:),yf(:,1),Vmag,'Interpolation','bilinear');
+hold on
+axis([x_min x_max y_min y_max]);
+colormap(jet)
+clb=colorbar;
+title(clb,'v [m/s]')
+quiver(xf,yf,u, v, 'Color','k')
+print(fig, "images/vmean.png", '-dpng', '-r300');
+
+%% Fluttuazioni
+close all
+clear
+clc
+
+load("cilindro22.mat")
+%%
+[nr, nc] = size(u_original{1});
+
+uavg = zeros(nr, nc);
+vavg = zeros(nr, nc);
+
+for frame = 1:frames
+    uavg = uavg + u_original{frame};
+    vavg = vavg + v_original{frame};
+end
+
+uavg = uavg/frames;
+vavg = vavg/frames;
+
+u_flutt = u_original;
+v_flutt = v_original;
+for frame = 1:frames
+    u_flutt{frame} = u_original{frame} - uavg;
+    v_flutt{frame} = v_original{frame} - vavg;
+end
+
+ix = 14;
+iy = 17;
+
+var = 0;
+for frame = 1:frames
+    var = var + u_flutt{frame}(iy, ix)^2 + v_flutt{frame}(iy, ix)^2;
+end
+var = var/frames;
+disp(var)
+
+PARSIVAL = trapz(linspace(0,30,300), Pxx);
+disp(PARSIVAL) 
+
+rho = 1000;
+tauRe = u_original;
+TAURE = zeros(nr, nc);
+for frame = 1:frames
+    tauRe{frame} = -rho .* u_flutt{frame} .* v_flutt{frame};
+    TAURE = TAURE + tauRe{frame};
+end
+TAURE = TAURE/frames;
+
+fig = figure();
+set(fig, "Position", [left, bottom, frameWidth, frameHeight]);
+imagesc(xf(1,:),yf(:,1),TAURE,'Interpolation','bilinear');
+hold on
+axis([x_min x_max y_min y_max]);
+colormap(jet)
+clb=colorbar;
+title(clb,'\tau_{Re} [N/m^2]')
+print(fig, "images/tauRe.png", '-dpng', '-r300');
+
 \end{lstlisting}
