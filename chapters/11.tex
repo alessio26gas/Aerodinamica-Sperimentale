@@ -117,7 +117,7 @@ Il toolbox PIVlab comprende gli algoritmi numerici della PIV con cui si può val
 L'analisi dati per la presente attività è condotta con l'ausilio di alcuni codici in Matlab, riportati in appendice \ref{b11}.\\\\
 I file \texttt{.mat} esportati da PIVlab contengono i campi di velocità per ciascun fotogramma dei video analizzati. Utilizzando un codice Matlab, è possibile generare delle animazioni che mostrano il campo di velocità, con una scala di colori per rappresentare l'intensità e delle frecce per indicare la direzione del flusso.
 \subsubsection{Campo istantaneo di velocità}
-Estraendo il campo di velocità in un determinato istante, si ottiene il campo di velocità istantaneo:
+Estraendo il campo di velocità in un determinato istante, si ottiene il campo istantaneo di velocità:
 \begin{figure}[H]
     \centering
     \includegraphics[height=.45\textwidth]{images/11/f300_22b.png}
@@ -209,7 +209,7 @@ Applicando la FFT ai segnali, si ottiene:
     \caption{Trasformata di Fourier (cilindro 2022, cilindro 2023, placca 2022)}
 \end{figure}
 
-\noindent Si osservano dei picchi nella trasformata di Fourier in corrispondenza della frequenza di svilamento dei vortici. I risultati della FFT cambiano a seconda del punto analizzato nello spazio, ma la frequenza che caratterizza lo sfilamento vorticoso rimane la stessa.\\\\
+\noindent Si osservano dei picchi nella trasformata di Fourier in corrispondenza della frequenza di sfilamento dei vortici. I risultati della FFT cambiano a seconda del punto analizzato nello spazio, ma la frequenza che caratterizza lo sfilamento vorticoso rimane la stessa.\\\\
 Per ricavare lo spettro di potenza dai risultati della FFT, si calcola il modulo al quadrato e si normalizza rispetto al numero di fotogrammi acquisiti $N_{frames}$:
 \begin{equation*}
     P(f) = \frac{ \left|\hat u(f)\right|^2}{N_{frames}} 
@@ -264,7 +264,7 @@ Si ottengono i seguenti risultati:
     \caption{Diagramma Reynolds-Strouhal}
 \end{figure}
 
-\noindent Il flusso che si sviluppa non risulta essere quello canonico 2D per via della sua dimensione finita che appoggia sulla parete inferiore della camera di prova. Inoltre, il piano di misura è a un diametro di distanza dal fondo, dove si sviluppa il vortice a ferro di cavallo (horseshoe vortex) e sono presenti effetti tridimensionali dovuti all'induzione del vortice. Per questi motivi i casi da studiare differiscono dai flussi canonici bidimensionali, pertanto, l'andamento Reynolds-Strouhal si discosta leggermente da quello studiato per il cilindro 2D utilizzando l'anemometria a filo caldo.
+\noindent Il flusso che si sviluppa non risulta essere quello canonico 2D per via della sua dimensione finita che appoggia sulla parete inferiore della camera di prova. Inoltre, il piano di misura è a un diametro di distanza dal fondo, dove si sviluppa il vortice a ferro di cavallo (horseshoe vortex) e sono presenti effetti tridimensionali dovuti all'induzione del vortice. Per questi motivi i casi esaminati differiscono dai flussi canonici bidimensionali, pertanto, l'andamento Reynolds-Strouhal si discosta leggermente da quello studiato per il cilindro 2D utilizzando l'anemometria a filo caldo.
 
 \subsubsection{Conservazione dell'energia (Teorema di Parseval)}
 Secondo il teorema di Parseval, l'energia totale di un segnale nel dominio del tempo è uguale all'energia totale nel dominio delle frequenze. Applicando il teorema al caso in esame, la varianza delle fluttuazioni nel dominio del tempo deve essere uguale all'integrale dello spettro di potenza nel dominio delle frequenze.\\\\
@@ -304,10 +304,11 @@ Dal campo di fluttuazioni di velocità si possono infine ricavare gli sforzi di 
     \tau_{Re} = -\rho \overline{u^\prime v^\prime}
 \end{equation*}
 dove con $\rho$ è indicata la densità dell'acqua $\rho = 1000$ kg/m$^3$.\\\\
-Gli sforzi di Reynolds forniscono una visione dettagliata delle interazioni turbolente nella scia del cilindro. La presenza di elevate fluttuazioni turbolente nelle regioni di separazione e ricircolo evidenzia l'importanza dei fenomeni turbolenti nel determinare il comportamento globale del flusso.\\\\
 Si ottiene quindi il seguente diagramma:
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{images/11/tauRe.png}
     \caption{Sforzi di Reynolds (cilindro 2022)}
 \end{figure}
+
+\noindent Gli sforzi di Reynolds forniscono una visione dettagliata delle interazioni turbolente nella scia del cilindro. La presenza di elevate fluttuazioni turbolente nelle regioni di separazione e ricircolo evidenzia l'importanza dei fenomeni turbolenti nel determinare il comportamento globale del flusso.

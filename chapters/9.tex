@@ -1,5 +1,5 @@
 \section{Strato limite su placca piana}\label{c9}
-La presente esercitazione si pone come obiettivo la caratterizzazione dello strato limite su placca piana mediante l'utilizzo dell'anemometria a filo caldo. In particolare, si vuole:
+La presente esercitazione si pone come obiettivo la caratterizzazione dello strato limite su una placca piana mediante l'utilizzo dell'anemometria a filo caldo. In particolare, si vuole:
 \begin{itemize}
     \item Misurare i profili di velocità per diverse ascisse $x$ con assegnata $U_\infty$;
     \item Caratterizzare la struttura dello strato limite:
@@ -98,13 +98,13 @@ Trattandosi di strato limite turbolento la velocità è da intendersi come veloc
 \subsection{Catena di misura}
 La galleria del vento è del tipo a circuito aperto-aspirato con camera di prova circolare e chiusa.\\\\
 All'interno della camera di prova è posta una placca piana, a contatto con le pareti della galleria in modo da rendere il flusso il più bidimensionale possibile.\\\\
-La sonda a filo caldo è posizionata verticalmente in prossimità della placca piana mediante un movimentatore elettromeccanico passo-passo, in grado di spostare verticalmente la sonda di un millimetro per ogni 200 passi.\\\\
+La sonda a filo caldo è posizionata in prossimità della placca piana mediante un movimentatore verticale elettromeccanico passo-passo, in grado di spostare verticalmente la sonda di un millimetro per ogni 200 passi.\\\\
 Il sistema sonda-movimentatore passo-passo, è posizionato lungo la mezzeria della galleria placca piana, ad una distanza $x$ misurata approssimativamente dal bordo di attacco.\\\\
 Nella catena di misura è inoltre presente un tubo di Pitot necessario per regolare la velocità del flusso nella galleria del vento ed un sistema di acquisizione dati.
 \begin{figure}[H]
     \centering
     \includegraphics[width=.8\textwidth]{images/9/sonda.jpg}
-    \caption{Sonda a filo caldo posizionata sulla placca piana}
+    \caption{Sonda a filo caldo posizionata in prossimità della placca piana}
 \end{figure}
 
 \begin{figure}[H]
@@ -180,7 +180,7 @@ Poiché si dispone di dati discreti, per gli integrali si utilizza la regola dei
 \begin{equation*}
     \int_a^b f(x)dx \approx \sum_{k=1}^n \frac{f(x_{k-1}) + f(x_k)}2 \Delta x_k \quad \text{con } \Delta x_k = x_k - x_{k-1}
 \end{equation*}
-Il metodo più immediato per determinare se lo strato limite analizzato è laminare, transizionale o turbolento, è il calcolo del numero di Reynolds locale $Re_x$, relativo alla coordinata $x$, se questo è maggiore del numero di Reynolds critico ($Re_{cr}\approx500000$) allora lo strato limite è laminare, altrimenti è turbolento:
+Il metodo più immediato per determinare se lo strato limite analizzato è laminare, transizionale o turbolento, è il calcolo del numero di Reynolds locale $Re_x$, relativo alla coordinata $x$, se questo è maggiore del numero di Reynolds critico ($Re_{cr}\approx500000$) allora lo strato limite è turbolento, altrimenti è laminare:
 \begin{equation*}
     Re_x = \frac{U_\infty x}\nu
 \end{equation*}

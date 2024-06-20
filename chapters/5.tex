@@ -13,14 +13,14 @@ I profili alari NACA sono forme geometriche standardizzate sviluppate dal Nation
     \item La seconda cifra fornisce la distanza del punto di massima curvatura dal bordo d'attacco espressa come percentuale della corda e in multipli di dieci;
     \item Le ultime due cifre descrivono il massimo spessore del profilo alare espresso come percentuale della corda.
 \end{itemize}
-Ad esempio, il profilo alare NACA 2412 presenta una curvatura massima del 2\%, situata al 40\% della corda partendo dal bordo d'attacco e ha uno spessore massimo del 12\% della corda. Nei profili alari NACA a quattro cifre lo spessore massimo è sempre posizionaot al 30\% della corda, sempre partendo dal bordo d'attacco.\\\\
+Ad esempio, il profilo alare NACA 2412 presenta una curvatura massima del 2\%, situata al 40\% della corda partendo dal bordo d'attacco e ha uno spessore massimo del 12\% della corda. Nei profili alari NACA a quattro cifre lo spessore massimo è sempre posizionato al 30\% della corda, sempre partendo dal bordo d'attacco.\\\\
 Il profilo alare NACA 0015, preso in esame, è simmetrico, in quanto le cifre 00 indicano che non vi è una curvatura. Il 15 indica che lo spessore massimo è il 15\% della sua lunghezza.
 \newpage
 \noindent La formula per generare la forma di un profio alare NACA $00xx$, dove "$xx$" va sostituito con lo spessore massimo espresso come percentuale della corda, è:
 \begin{equation*}
     y_t = 5tc\left[ 0.2969\sqrt{\frac{x}{c}} -0.1260\left(\frac{x}{c}\right) -0.3516\left(\frac xc \right)^2 + 0.2843 \left( \frac xc \right)^3 -0.1015 \left( \frac xc \right)^4 \right]
 \end{equation*}
-Dove:
+dove:
 \begin{itemize}
     \item $c$ è la lunghezza della corda;
     \item $x$ è la posizione lungo la corda da 0 a $c$;
@@ -29,12 +29,12 @@ Dove:
 \end{itemize}
 
 \subsection{Descrizione dell'esperimento}
-Nella presente attività, il profilo alare NACA 0015, di corda pari a $c=100$ mm, è studiato con l'utilizzo di una galleria del vento. Le forze di pressione esercitate dal fluido sul profilo giaccino sul piano del campo di moto. Le forza aerodinamica generata dal flusso può essere scomposta in due componenti, una parallela ed una normale alla velocità, rispettivamente la resistenza e la portanza. Tali forze risultano applicate in un punto detto centro di pressione.\\\\
+Nella presente attività, il profilo alare NACA 0015, di corda pari a $c=100$ mm, è studiato con l'utilizzo di una galleria del vento aperta. Le forze di pressione esercitate dal fluido sul profilo giacciono sul piano del campo di moto. Le forza aerodinamica generata dal flusso può essere scomposta in due componenti, una parallela ed una normale alla velocità, rispettivamente la resistenza e la portanza. Tali forze risultano applicate in un punto detto centro di pressione.\\\\
 Nota la distribuzione di pressione relativa $p-p_\infty$ sulla superficie del profilo $S$, la risultante delle forze aerodinamiche $F$ è data da:
 \begin{equation*}
     F = \int_S (p-p_\infty)\vec n dS
 \end{equation*}
-Considerando un profilo immerso in una corrente uniforme di velocità $V_\infty$, posto ad incidenza $\alpha$, si utilizzano i pedici $+$ e $-$ per indicare le grandezze riferite rispettivamente a dorso e ventre del profilo.\\\\
+Considerando un profilo immerso in una corrente uniforme di velocità $V_\infty$, posto ad incidenza $\alpha$, si utilizzano i pedici "$+$" e "$-$" per indicare le grandezze riferite rispettivamente a dorso e ventre del profilo.\\\\
 Considerando un tratto di superficie del dorso di profondità unitaria, si ha:
 \begin{equation*}
     dF_+ = (p_+ - p_\infty)(ds_+ \cdot 1)
@@ -73,7 +73,7 @@ Si può riscrivere l'espressione della portanza come:
 \begin{equation*}
     L = \frac12 \rho V^2_\infty \int_0^c (c_{p-}-c_{p+})dx
 \end{equation*}
-Introducendo il coefficiente portanza, e considerando un flusso bidimensionale, si può adimensionalizzare la portanza rispetto ad una superficie di larghezza pari alla corda $c$ e profondità unitaria:
+Introducendo il coefficiente di portanza, e considerando un flusso bidimensionale, si può adimensionalizzare la portanza rispetto ad una superficie di larghezza pari alla corda $c$ e profondità unitaria:
 \begin{equation*}
     c_L = \int_0^1(c_{p-}-c_{p+})d\left( \frac xc \right)
 \end{equation*}
@@ -115,8 +115,8 @@ Per il calcolo della posizione del fuoco è sufficiente quindi imporre la condiz
 \begin{equation*}
     \frac{\partial c_{M_{ac}}}{\partial \alpha} = 0
 \end{equation*}
-Avendo cura di sostituire l'espressione per il coefficiente di momento sul bordo di attacco e per il coefficiente di portanza nel tratto lineare delle rispettive curve.\\\\
-Per un profilo in campo subsonico, la posizione del centro aerodinamico corrisponde a circa il 25\% della corda, mentre nel caso di campo supersonico il fuoco dei profili alare è posizionato in corrispondenza del 50\% della corda.\\\\
+avendo cura di sostituire l'espressione per il coefficiente di momento sul bordo di attacco e per il coefficiente di portanza nel tratto lineare delle rispettive curve.\\\\
+Per un profilo in campo subsonico, la posizione del centro aerodinamico corrisponde a circa il 25\% della corda, mentre nel caso di campo supersonico il fuoco dei profili alare risulta in corrispondenza del 50\% della corda.\\\\
 Una volta calcolato il fuoco del profilo è infine possibile ricavare il coefficiente di momento aerodinamico:
 \begin{equation*}
     c_{M_{ac}} = c_{M_{LE}} + c_L \frac{x_{ac}}c
@@ -140,7 +140,7 @@ Per misurare la distribuzione di pressione sul dorso e sul ventre del profilo al
 
 \noindent Sul profilo alare sono posizionate 11 prese di pressione, alle seguenti coordinate dal bordo di attacco:
 \begin{equation*}
-    \left( \frac xc \right) = 0,\ 2.5,\ 5,\ 10,\ 20,\ 30,\ 40,\ 50,\ 60,\ 70,\ 80
+    \left( \frac xc \right) = [0,\ 2.5,\ 5,\ 10,\ 20,\ 30,\ 40,\ 50,\ 60,\ 70,\ 80] \%
 \end{equation*}
 Queste prese sono presenti solo su una faccia del profilo, questo perché data la geometria simmetrica, il campo di pressione rilevato sul dorso ad un angolo di incidenza positiva è uguale al campo di pressione che si rileva sul ventre allo stesso angolo di incidenza con segno opposto.
 \begin{figure}[h]
@@ -162,7 +162,7 @@ Tenuto conto che nello strato limite tutte le grandezze variano rapidamente con 
     \frac{\partial P}{\partial y} = 0
 \end{equation*}
 Cioè la pressione statica nello strato limite lungo la coordinata $y$ rimane costante. Pertanto, è possibile considerare la pressione statica misurata a parete uguale alla pressione statica appena fuori dallo strato limite, ottenendo quindi informazioni sul campo di moto attorno al profilo.\\\\
-Oltre alle 11 prese di pressione statica sul profilo, sono presenti altre due prese subito a valle del convergente, una per la pressione totale ed una per la pressione statica. Queste 13 prese sono collegate tramite condotti pneumatici ad un multimanometro differenziale.\\\\
+Oltre alle undici prese di pressione statica sul profilo, sono presenti altre due prese subito a valle del convergente, una per la pressione totale ed una per la pressione statica. Queste tredici prese sono collegate tramite condotti pneumatici ad un multimanometro differenziale.\\\\
 In particolare, la presa di pressione statica all'ingresso della camera di prova e la presa di pressione totale della corrente sono connesse con le canne 1 e 2 del multimanometro, le canne 3 e 4 sono libere e quindi rilevano la pressione ambiente mentre le altre 11 canne sono impegnate dai segnali delle prese su una delle due facce del profilo alare.
 \begin{figure}[H]
     \centering
@@ -170,7 +170,7 @@ In particolare, la presa di pressione statica all'ingresso della camera di prova
     \caption{Multimanometro}
 \end{figure}
 
-\noindent Le canne manometriche sono inclinate con un angolo $\beta=15^\circ$ e riempite con alcool etilico, di densità nota $\rho_{fm} = 0.789$ g/cm$^3$.\\\\
+\noindent Le canne manometriche sono inclinate con un angolo $\beta=30^\circ$ e riempite con alcool etilico, di densità nota $\rho_{fm} = 0.789$ g/cm$^3$.\\\\
 Il peso specifico del fluido manometrico si ottiene come:
 \begin{equation*}
     \gamma_{fm} = g_0 \rho_{fm} = 7732\ \text{N/m}^3
@@ -310,7 +310,7 @@ Si ottengono i seguenti numeri di Reynolds per le quattro squadre:
 \end{equation*}
 
 \subsubsection{Coefficiente di pressione}
-Dai dati sulle altezze delle canne manometriche è immediato ricavare i coefficienti di pressioni valutati ad ogni posizione sul profilo e per ogni incidenza:
+Dai dati sulle altezze delle canne manometriche è immediato ricavare i coefficienti di pressione valutati ad ogni posizione sul profilo $x$ e per ogni incidenza $\alpha$:
 \begin{equation*}
     c_p(x,\alpha) = \frac{h_\infty-h}{h_\infty - h_{0\infty}}
 \end{equation*}
@@ -464,7 +464,7 @@ Per il calcolo della posizione del fuoco si impone la proprietà focale, avendo 
 \begin{equation*}
     \frac{x_{ac}}c = - \frac{c_{M_{LE}\alpha}}{c_{L\alpha}} = \frac{1.3}{5.2} = 0.25
 \end{equation*}
-Questo risultato è valido per il campo subsonico mentre in campo supersonico il fuoco dei profili alari è posizionato in corrispondenza del 50\% della corda.
+Questo risultato è valido per il campo subsonico mentre in campo supersonico il fuoco dei profili alari risulta in corrispondenza del 50\% della corda.
 
 \subsubsection{Coefficiente di momento aerodinamico}
 Una volta calcolata la posizione del fuoco si può ricavare il coefficiente di momento aerodinamico:
