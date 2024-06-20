@@ -116,12 +116,12 @@ Il toolbox PIVlab comprende gli algoritmi numerici della PIV con cui si può val
 \subsection{Analisi dati}
 L'analisi dati per la presente attività è condotta con l'ausilio di alcuni codici in Matlab, riportati in appendice \ref{b11}.\\\\
 I file \texttt{.mat} esportati da PIVlab contengono i campi di velocità per ciascun fotogramma dei video analizzati. Utilizzando un codice Matlab, è possibile generare delle animazioni che mostrano il campo di velocità, con una scala di colori per rappresentare l'intensità e delle frecce per indicare la direzione del flusso.
-\subsubsection{Campo di velocità istantanea}
+\subsubsection{Campo istantaneo di velocità}
 Estraendo il campo di velocità in un determinato istante, si ottiene il campo di velocità istantaneo:
 \begin{figure}[H]
     \centering
-    \includegraphics[height=.52\textwidth]{images/11/f300_22b.png}
-    \includegraphics[height=.5\textwidth]{images/11/f300_220.png}
+    \includegraphics[height=.45\textwidth]{images/11/f300_22b.png}
+    \includegraphics[height=.45\textwidth]{images/11/f300_220.png}
     \caption{Campo istantaneo di velocità (cilindro e placca 2022)}
 \end{figure}
 
@@ -135,39 +135,67 @@ Estraendo il campo di velocità in un determinato istante, si ottiene il campo d
 
 \noindent Si osserva come il flusso aumenta di velocità, ciò è dovuto alla geometria convergente del canale idrodinamico. Si osserva inoltre molto chiaramente lo sfilamento vorticoso.
 
-\subsubsection{Campo di velocità media}
+\subsubsection{Campo medio di velocità}
 Mediando il campo di velocità nel tempo, considerando quindi tutti i fotogrammi, si ottiene il seguente diagramma:
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.92\textwidth]{images/11/mean.png}
+    \includegraphics[width=.9\textwidth]{images/11/mean.png}
     \caption{Campo medio di velocità (cilindro 2022)}
 \end{figure}
 
 \noindent Si può pensare di mediare solo le componenti longitudinali $u$ e trasversali $v$ al condotto:
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.92\textwidth]{images/11/Umean.png}
-    \caption{Componente longitudinale della velocità media $u$ (cilindro 2022)}
+    \includegraphics[width=.9\textwidth]{images/11/Umean.png}
+    \caption{Velocità media longitudinale $u$ (cilindro 2022)}
 \end{figure}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.8\textwidth]{images/11/vmean.png}
-    \caption{Componente trasversale della velocità media $v$ (cilindro 2022)}
+    \includegraphics[width=.9\textwidth]{images/11/vmean.png}
+    \caption{Velocità media trasversale $v$ (cilindro 2022)}
 \end{figure}
 
+\noindent Si evince come la componente dominante della velocità del flusso è quella longitudinale.
+
+\subsubsection{Fluttuazioni di velocità}
+Si procede al calcolo delle fluttuazioni di velocità sottraendo in ogni punto la velocità media temporale:
+\begin{equation*}
+    u^\prime(t) = u(t) - \overline u \qquad v^\prime(t) = v(t) - \overline v  
+\end{equation*}
+Diagrammando le fluttuazioni di velocità per uno specifico fotogramma, si osserva molto chiaramente il fenomeno dello sfilamento vorticoso:
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.95\textwidth]{images/11/flutt.png}
+    \caption{Campo delle fluttuazioni di velocità $\vec V^\prime$ (cilindro 2022)}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.97\textwidth]{images/11/fluttu.png}
+    \caption{Fluttuazioni di velocità longitudinale $u^\prime$ (cilindro 2022)}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=.97\textwidth]{images/11/fluttv.png}
+    \caption{Fluttuazioni di velocità trasversale $v^\prime$ (cilindro 2022)}
+\end{figure}
+
+\noindent Dal diagramma delle fluttuazioni di velocità trasversale si evince come i vortici siano controrotanti.
+
+\newpage
 \subsubsection{Vortex shedding}
 Per studiare il vortex shedding si può tracciare un diagramma della velocità in funzione del tempo in un punto fisso nello spazio, in corrispondenza dei vortici che si generano. Si ottengono quindi i seguenti risultati:
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.46\textwidth]{images/11/timeseries22.png}
-    \includegraphics[width=.46\textwidth]{images/11/timeseries23.png}
-    \includegraphics[width=.46\textwidth]{images/11/timeseries220.png}
+    \includegraphics[width=.55\textwidth]{images/11/timeseries22.png}
+    \includegraphics[width=.49\textwidth]{images/11/timeseries23.png}
+    \includegraphics[width=.49\textwidth]{images/11/timeseries220.png}
     \caption{Velocità in un punto (cilindro 2022, cilindro 2023, placca 2022)}
 \end{figure}
 
-\noindent Dai diagrammi nel dominio del tempo si evince la presenza di una frequenza dominante, che caratterizza lo sfilamento vorticoso. Una rappresentazione più efficace può essere fatta sfruttando lo spettro di potenza.\\\\
-Questa volta, però, il metodo di Welch non è una soluzione efficiente, in quanto il numero di frame acquisiti (600) è troppo basso per ottenere una stima accurata dello spettro di potenza utilizzando questo approccio. La frequenza di campionamento delle immagini (pari a $f_{samp}=60$ Hz) comporta, secondo il teorema di Nyquist, una massima frequenza rilevabile di 30 Hz. Tuttavia, dato che il segnale non presenta rumore significativo, è più efficiente utilizzare direttamente la FFT (Fast Fourier Transform):
+\noindent Dai diagrammi nel dominio del tempo si evince la presenza di una frequenza dominante, che caratterizza lo sfilamento vorticoso.\\\\
+Una rappresentazione più efficace può essere fatta sfruttando lo spettro di potenza.\\\\
+Questa volta, però, il metodo di Welch non è una soluzione efficiente, in quanto il numero di fotogrammi acquisiti (600) è molto basso. Dato che il segnale non presenta rumore significativo, è più efficiente utilizzare direttamente la FFT (Fast Fourier Transform):
 \begin{equation*}
     \hat u(f) = \Delta t_{samp} \sum_{i=1}^{N_{frames}} u_i e^{-j2\pi f_i \Delta t_{samp}}
 \end{equation*}
@@ -175,25 +203,29 @@ La FFT fornisce una rappresentazione spettrale accurata senza la necessità di s
 Applicando la FFT ai segnali, si ottiene:
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.49\textwidth]{images/11/FFT22.png}
+    \includegraphics[width=.6\textwidth]{images/11/FFT22.png}
     \includegraphics[width=.49\textwidth]{images/11/FFT23.png}
     \includegraphics[width=.49\textwidth]{images/11/FFT220.png}
     \caption{Trasformata di Fourier (cilindro 2022, cilindro 2023, placca 2022)}
 \end{figure}
 
-\noindent Per ricavare lo spettro di potenza dai risultati della FFT, si calcola il modulo al quadrato e si normalizza rispetto al numero di fotogrammi $N_{frames}$:
+\noindent Si osservano dei picchi nella trasformata di Fourier in corrispondenza della frequenza di svilamento dei vortici. I risultati della FFT cambiano a seconda del punto analizzato nello spazio, ma la frequenza che caratterizza lo sfilamento vorticoso rimane la stessa.\\\\
+Per ricavare lo spettro di potenza dai risultati della FFT, si calcola il modulo al quadrato e si normalizza rispetto al numero di fotogrammi acquisiti $N_{frames}$:
 \begin{equation*}
-    P(f) = \left| \frac{\hat u(f)}{N_{frames}} \right|^2
+    P(f) = \frac{ \left|\hat u(f)\right|^2}{N_{frames}} 
 \end{equation*}
+\newpage
+\noindent Successivamente, si diagramma lo spettro di potenza in scala logaritmica:
 \begin{figure}[H]
     \centering
-    \includegraphics[width=.49\textwidth]{images/11/PSD22.png}
+    \includegraphics[width=.55\textwidth]{images/11/PSD22.png}
     \includegraphics[width=.49\textwidth]{images/11/PSD23.png}
-    \includegraphics[width=.55\textwidth]{images/11/PSD220.png}
+    \includegraphics[width=.49\textwidth]{images/11/PSD220.png}
     \caption{Spettro di potenza (cilindro 2022, cilindro 2023, placca 2022)}
 \end{figure}
 
-\noindent Dallo spettro di potenza si ricava la frequenza di shedding $f_s$, inoltre, si può stimare la velocità a monte del flusso $U_\infty$ da un punto non influenzato dai vortici. Si ottiene:
+\noindent Dallo spettro di potenza si ricava quindi il valore di frequenza di shedding $f_s$.\\\\
+Inoltre, si può stimare la velocità a monte del flusso $U_\infty$ prendendo in considerazione un punto non appartenente alla scia. Si ottiene:
 \begin{table}[H]
     \centering
     \begin{tabular}{|c|c|c|}
@@ -234,49 +266,45 @@ Si ottengono i seguenti risultati:
 
 \noindent Il flusso che si sviluppa non risulta essere quello canonico 2D per via della sua dimensione finita che appoggia sulla parete inferiore della camera di prova. Inoltre, il piano di misura è a un diametro di distanza dal fondo, dove si sviluppa il vortice a ferro di cavallo (horseshoe vortex) e sono presenti effetti tridimensionali dovuti all'induzione del vortice. Per questi motivi i casi da studiare differiscono dai flussi canonici bidimensionali, pertanto, l'andamento Reynolds-Strouhal si discosta leggermente da quello studiato per il cilindro 2D utilizzando l'anemometria a filo caldo.
 
-\newpage
-\subsubsection{Fluttuazioni di velocità}
-Si procede al calcolo delle fluttuazioni di velocità sottraendo in ogni punto la velocità media temporale:
-\begin{equation*}
-    u^\prime(t) = u(t) - \overline u \qquad v^\prime(t) = v(t) - \overline v  
-\end{equation*}
-Diagrammando le fluttuazioni di velocità per uno specifico fotogramma, si osserva molto chiaramente il fenomeno dello sfilamento vorticoso:
-% immagine cilindro 22 shedding fluttuazioni istantanee u
-% immagine cilindro 22 shedding fluttuazioni istantanee v
-
-\subsubsection{Conservazione dell'energia (Parseval)}
-Dalle fluttuazioni si può inoltre ricavare la varianza:
-\begin{equation*}
-    \text{var}(\vec V) = \overline{{V^\prime}^2} = \frac 1{N_{frames}} \sum ({u^\prime}^2 + {v^\prime}^2)
-\end{equation*}
+\subsubsection{Conservazione dell'energia (Teorema di Parseval)}
 Secondo il teorema di Parseval, l'energia totale di un segnale nel dominio del tempo è uguale all'energia totale nel dominio delle frequenze. Applicando il teorema al caso in esame, la varianza delle fluttuazioni nel dominio del tempo deve essere uguale all'integrale dello spettro di potenza nel dominio delle frequenze.\\\\
-Considerando un segnale reale $x(t)$, la sua trasformata di Fourier $X(f)$ gode della proprietà di simmetria coniugata, cioè:
+La varianza delle fluttuazioni di velocità si ottiene come:
+\begin{equation*}
+    \text{var}(\vec V) = \overline{{V^\prime}^2} = \frac 1{N_{frames}} \sum_{i=1}^{N_{frames}} \left|{\vec V_i} - {\overline {\vec V}}\right|^2
+\end{equation*}
+Considerando un segnale reale $x(t)$, la sua trasformata di Fourier $X(f)$ gode della proprietà di simmetria coniugata, indicando con $X^*(f)$ il complesso coniugato, questa si scrive come:
 \begin{equation*}
     X(f) = X^*(-f)
 \end{equation*}
-di conseguenza, il suo modulo al quadrato, e quindi anche lo spettro di potenza, è simmetrico:
+di conseguenza, il modulo al quadrato della trasformata di Fourier, e quindi anche lo spettro di potenza, risulta simmetrico:
 \begin{equation*}
     |X(f)|^2 = |X(-f)|^2 \quad \rightarrow \quad P(f) = P(-f)
 \end{equation*}
 L'energia totale nel dominio delle frequenze si calcola come:
 \begin{equation*}
-    E = \int_{-f_{samp}/2}^{f_{samp}/2} P(f) df
+    E = \int_{-\frac{f_{samp}}2}^{\frac{f_{samp}}2} P(f) df 
+\end{equation*}
+questo integrale può essere scomposto nel seguente modo:
+\begin{equation*}
+    \int_{-\frac{f_{samp}}2}^{\frac{f_{samp}}2} P(f) df = \int_{-\frac{f_{samp}}2}^{0} P(f) df + \int_{0}^{\frac{f_{samp}}2} P(f) df
 \end{equation*}
 data la simmetria, si evince che:
 \begin{equation*}
-    \int_{-f_{samp}/2}^{f_{samp}/2} P(f) df = 2\int_0^{\frac{f_{samp}}2} P(f) df
+    \int_{-\frac{f_{samp}}2}^{0} P(f) df + \int_{0}^{\frac{f_{samp}}2} P(f) df = 2\int_0^{\frac{f_{samp}}2} P(f) df
 \end{equation*}
-Pertanto, per il teorema di Paresval, la varianza risulta pari a:
+Pertanto, per il teorema di Parseval, la varianza risulta pari a:
 \begin{equation*}
     \overline{{V^\prime}^2} = 2\int_0^{\frac{f_{samp}}2} P(f) df
 \end{equation*}
-Questa uguaglianza è verificata mediante un codice Matlab.
+Questa uguaglianza è verificata mediante un codice Matlab in ogni punto del dominio di calcolo (appendice \ref{b11}).
 
 \subsubsection{Sforzi di Reynolds}
-Dal campo di fluttuazioni di velocità si possono inoltre ricavare gli sforzi di Reynolds:
+Dal campo di fluttuazioni di velocità si possono infine ricavare gli sforzi di Reynolds:
 \begin{equation*}
     \tau_{Re} = -\rho \overline{u^\prime v^\prime}
 \end{equation*}
+dove con $\rho$ è indicata la densità dell'acqua $\rho = 1000$ kg/m$^3$.\\\\
+Gli sforzi di Reynolds forniscono una visione dettagliata delle interazioni turbolente nella scia del cilindro. La presenza di elevate fluttuazioni turbolente nelle regioni di separazione e ricircolo evidenzia l'importanza dei fenomeni turbolenti nel determinare il comportamento globale del flusso.\\\\
 Si ottiene quindi il seguente diagramma:
 \begin{figure}[H]
     \centering

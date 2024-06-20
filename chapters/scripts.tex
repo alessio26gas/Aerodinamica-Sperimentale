@@ -1324,6 +1324,7 @@ if __name__ == "__main__":
 \subsection{PIV: studio della scia di corpi tozzi}\label{b11}
 Per l'analisi dati della presente esercitazione sono stati utilizzati i seguenti codici in Matlab:
 \begin{lstlisting}[style=Matlab-editor, basicstyle=\ttfamily\footnotesize]
+% Codice per generare i fotogrammi delle animazioni
 close all
 clear
 clc
@@ -1405,8 +1406,10 @@ movie(M, 10, fps);
 \end{lstlisting}
 
 \begin{lstlisting}[style=Matlab-editor, basicstyle=\ttfamily\footnotesize]
+% codice utilizzato per l'analisi dati
 close all
 clear
+clc
 
 anno = 222;
 
@@ -1439,9 +1442,19 @@ end
 load(filename)
 frames = length(u_original);
 
+% NAN FIX
+for frame = 1:frames
+    mat = u_original{frame};
+    mat(isnan(mat)) = 0;
+    u_original{frame} = mat;
+    mat = v_original{frame};
+    mat(isnan(mat)) = 0;
+    v_original{frame} = mat;
+end
+
+% Calcolo della velocità in un punto e della velocità a monte
 u = zeros(frames, 1);
 u_inf = zeros(frames, 1);
-
 for frame=1:frames
     u_inf(frame) = sqrt(u_original{frame}(iy_inf, ix_inf)^2 + v_original{frame}(iy_inf, ix_inf)^2);
     u(frame) = sqrt(v_original{frame}(iy, ix)^2 + u_original{frame}(iy, ix)^2);
@@ -1454,6 +1467,7 @@ ylabel("u [m/s]")
 grid minor
 print(k, sprintf('images/timeseries%d.png', anno), '-dpng', '-r300');
 
+% Calcolo della trasformata di Fourier
 Fs = fps;
 Nx = length(u);
 f = (0:floor(Nx/2)) * (Fs/Nx);
@@ -1469,10 +1483,12 @@ ylabel('Fast Fourier Transform [m/s]')
 grid on
 print(q, sprintf('images/FFT%d.png', anno), '-dpng', '-r300');
 
+% Calcolo dello spettro di potenza
 j = figure();
 Pxx = (1/(Fs*Nx)) * abs(U).^2;
 Pxx = Pxx(1:floor(Nx/2)+1);
 loglog(f, Pxx);
+
 xlabel('f [Hz]')
 ylabel('Power Spectral Density (PSD) [J/kg]')
 grid on
@@ -1482,8 +1498,9 @@ print(j, sprintf('images/PSD%d.png', anno), '-dpng', '-r300');
 disp("Frequenza di shedding: " + f(ind) + " Hz")
 
 U_inf = mean(abs(u_inf(isfinite(u_inf))));
-disp("Velocita' a monte: " + U_inf)
+disp("Velocità a monte: " + U_inf)
 
+% Calcolo dei numeri di Reynolds e Strouhal
 if anno == 220
     D = 0.024;
 else
@@ -1510,7 +1527,7 @@ set(h, "Position", [left, bottom, frameWidth, frameHeight]);
 disp("Playing animation...")
 movie(M, 10, fps);
 
-%% Campo istantaneo
+%% Campo istantaneo di velocità
 frame = 326;
 uist = u_original{frame};
 vist = v_original{frame};
@@ -1532,28 +1549,32 @@ print(hh, sprintf('images/f300_%b.png', anno), '-dpng', '-r300');
 
 %% Campo medio e fluttuazioni
 [nr, nc] = size(u_original{1});
-
+% Campo medio
 uavg = zeros(nr, nc);
 vavg = zeros(nr, nc);
-
 for frame = 1:frames
     uavg = uavg + u_original{frame};
     vavg = vavg + v_original{frame};
 end
-
 uavg = uavg/frames;
 vavg = vavg/frames;
-
+Vavg = sqrt(uavg.^2 + vavg.^2);
+% Fluttuazioni
 u_flutt = u_original;
 v_flutt = v_original;
+flutt = u_original;
 for frame = 1:frames
     u_flutt{frame} = u_original{frame} - uavg;
     v_flutt{frame} = v_original{frame} - vavg;
+    flutt{frame} = sqrt(u_flutt{frame}.^2 + v_flutt{frame}.^2);
 end
-
+% Teorema di Parseval
 ix = 14;
 iy = 17;
-
+u = zeros(frames, 1);
+for frame=1:frames
+    u(frame) = sqrt(v_original{frame}(iy, ix)^2 + u_original{frame}(iy, ix)^2);
+end
 var = 0;
 for frame = 1:frames
     var = var + (u(frame) - mean(u))^2;
@@ -1562,24 +1583,28 @@ var = var/frames;
 pars = 2*trapz(linspace(0,30,300), Pxx);
 disp("Varianza: " + var + " m2/s2")
 disp("Integrale dello spettro di potenza: " + pars + " J/kgs")
-
+% Sforzi di Reynolds
 rho = 1000;
-tauRe = u_original;
-TAURE = zeros(nr, nc);
+tauReist = u_original;
+tauRe = zeros(nr, nc);
 for frame = 1:frames
-    tauRe{frame} = -rho .* u_flutt{frame} .* v_flutt{frame};
-    TAURE = TAURE + tauRe{frame};
+    tauReist{frame} = -rho .* u_flutt{frame} .* v_flutt{frame};
+    tauRe = tauRe + tauReist{frame};
 end
-TAURE = TAURE/frames;
+tauRe = tauRe/frames;
 
+%% Genera immagine
+frame = 326;
 fig = figure();
 set(fig, "Position", [left, bottom, frameWidth, frameHeight]);
-imagesc(xf(1,:),yf(:,1),TAURE,'Interpolation','bilinear');
+imagesc(xf(1,:),yf(:,1), tauRe,'Interpolation','bilinear');
 hold on
 axis([x_min x_max y_min y_max]);
 colormap(jet)
 clb=colorbar;
+% clim([0 0.08])
 title(clb,'\tau_{Re} [N/m^2]')
+% quiver(xf,yf,u_flutt{frame}, v_flutt{frame}, 'Color','k')
 print(fig, "images/tauRe.png", '-dpng', '-r300');
 
 %% Confronto Reynolds-Strouhal
