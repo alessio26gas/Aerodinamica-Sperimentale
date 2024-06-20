@@ -1442,7 +1442,7 @@ end
 load(filename)
 frames = length(u_original);
 
-% NAN FIX
+% NaN FIX
 for frame = 1:frames
     mat = u_original{frame};
     mat(isnan(mat)) = 0;
@@ -1452,7 +1452,7 @@ for frame = 1:frames
     v_original{frame} = mat;
 end
 
-% Calcolo della velocità in un punto e della velocità a monte
+% Calcolo della velocita' in un punto e della velocita' a monte
 u = zeros(frames, 1);
 u_inf = zeros(frames, 1);
 for frame=1:frames
@@ -1498,7 +1498,7 @@ print(j, sprintf('images/PSD%d.png', anno), '-dpng', '-r300');
 disp("Frequenza di shedding: " + f(ind) + " Hz")
 
 U_inf = mean(abs(u_inf(isfinite(u_inf))));
-disp("Velocità a monte: " + U_inf)
+disp("Velocita' a monte: " + U_inf)
 
 % Calcolo dei numeri di Reynolds e Strouhal
 if anno == 220
@@ -1527,7 +1527,7 @@ set(h, "Position", [left, bottom, frameWidth, frameHeight]);
 disp("Playing animation...")
 movie(M, 10, fps);
 
-%% Campo istantaneo di velocità
+%% Campo istantaneo
 frame = 326;
 uist = u_original{frame};
 vist = v_original{frame};
