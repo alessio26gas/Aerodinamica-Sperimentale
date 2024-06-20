@@ -13,7 +13,7 @@ La valutazione della velocità in ogni punto del campo discende direttamente dal
 \end{equation*}
 La tecnica richiede l'immissione di particelle nel campo che consentono la valutazione della velocità della corrente attraverso il calcolo dello spostamento $\Delta s$. L'intervallo di tempo $\Delta t$ è invece impostato sul sistema dall'operatore.\\\\
 La tecnica PIV è caratterizzata da una elevata risoluzione spaziale dovuta alle caratteristiche della telecamera utilizzata. Infatti, in relazione alle dimensioni del campo fisico ripreso il numero di vettori calcolati per unità di superficie dell'immagine ripresa risulta essere molto elevato e tale da rendere la misura tendente al puntiforme. Questo consente di descrivere il campo di moto dettagliatamente nello spazio evidenziando accuratamente le regioni caratterizzate da elevati gradienti di velocità.\\\\
-La configurazione Time Resolved Particle Image Velocimetry (TR-PIV) associa l'elevata risoluzione spaziale ad una buona risoluzione temporale che consente di campionare le immagine fino a diverse migliaia di fotogrammi al secondo. Rispetto alla risposta in frequenza della tecnica anemometrica a filo caldo e a quella dell'anemometria LDA quella della tecnica PIV è molto più bassa.\\\\
+La configurazione Time Resolved Particle Image Velocimetry (TR-PIV) associa l'elevata risoluzione spaziale ad una buona risoluzione temporale che consente di campionare le immagini fino a diverse migliaia di fotogrammi al secondo. Rispetto alla risposta in frequenza della tecnica anemometrica a filo caldo e a quella dell'anemometria LDA quella della tecnica PIV è molto più bassa.\\\\
 La sorgente laser emette un raggio luminoso, coerente e monocromatico, che viene fatto espandere attraverso un sistema di lenti generando un piano di luce di spessore molto piccolo.\\\\
 La tecnica prevede l'inseminazione della corrente da esaminare mediante particelle iniettate a monte o direttamente nel campo di moto attraverso un sistema di inseminazione. Le particelle, attraversando il piano di luce, sono illuminate e riflettono rendendosi visibili alla telecamera, che ne riprende la loro posizione. L'inseminazione deve essere caratterizzata da una densità di particelle elevata, come regola empirica ogni "area di interrogazione" deve contenere come ordine di grandezza dieci particelle.\\\\
 La telecamera deve essere posizionata perpendicolarmente al piano illuminato e deve acquisire le immagini PIV, sulle quali sono riportate le tracce delle particelle illuminate. Le immagini sono costituite da un numero di righe di pixel $M$ e da un numero di colonne di pixel $N$, che individuano il numero totale di pixel. Si definisce quindi risoluzione il prodotto tra $N$ e $M$.\\\\
@@ -45,7 +45,7 @@ La cross-correlazione può essere calcolata utilizzando la FFT tramite il teorem
 \begin{equation*}
 C(x, y) = \mathcal{F}^{-1} \{ \mathcal{F}[A(x, y)] \cdot \mathcal{F}[B(x, y)]^* \}
 \end{equation*}
-dove $\mathcal{F}$ denota la trasformata di Fourier e $\mathcal{F}^{-1}$ l'antitrasformata, mentre con l'apice $^*$ si denota il complesso coniugato.\\\\
+dove $\mathcal{F}$ denota la trasformata di Fourier e $\mathcal{F}^{-1}$ l'antitrasformata, mentre con l'apice "$^*$" si denota il complesso coniugato.\\\\
 Mediante questi algoritmi numerici, la cross-correlazione di ciascuna area di interrogazione tra due immagini successive permette di determinare lo spostamento delle particelle e quindi il campo di velocità del fluido.
 
 \subsection{Catena di misura}
@@ -205,7 +205,7 @@ Applicando la FFT ai segnali, si ottiene:
 \begin{equation*}
     Re = \frac{U_\infty D}{\nu_{H_2O} }
 \end{equation*}
-Dove $D$ rappresenta una lunghezza caratteristica del corpo esaminato (diametro per il cilindro o lunghezza per la placca piana), mentre $\nu_{H_2O}$ è la viscosità cinematica dell'acqua ($\nu_{H_2O}\approx 9.31\cdot10^{-7}$ m$^2$/s). Con la frequenza di shedding $f_s$ si ricava invece il numero di Strouhal:
+dove $D$ rappresenta una lunghezza caratteristica del corpo esaminato (diametro per il cilindro o lunghezza per la placca piana), mentre $\nu_{H_2O}$ è la viscosità cinematica dell'acqua ($\nu_{H_2O}\approx 9.31\cdot10^{-7}$ m$^2$/s). Con la frequenza di shedding $f_s$ si ricava invece il numero di Strouhal:
 \begin{equation*}
     St = \frac{f_s D}{U_\infty}
 \end{equation*}
@@ -238,7 +238,7 @@ Dalle fluttuazioni si può ricavare la varianza:
 \begin{equation*}
     \text{var}(\vec V) = \overline{{V^\prime}^2} = \frac 1{N_{frames}} \sum ({u^\prime}^2 + {v^\prime}^2)
 \end{equation*}
-Che per il teorema di Parisval sulla conservazione dell'energia, risulta pari a:
+Per il teorema di Parisval, la varianza risulta pari a:
 \begin{equation*}
     \overline{{V^\prime}^2} = \int_0^{\frac{f_{samp}}2} P(f) df
 \end{equation*}
