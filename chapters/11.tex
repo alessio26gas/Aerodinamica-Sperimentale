@@ -115,7 +115,9 @@ Il toolbox PIVlab comprende gli algoritmi numerici della PIV con cui si può val
 \newpage
 \subsection{Analisi dati}
 L'analisi dati per la presente attività è condotta con l'ausilio di alcuni codici in Matlab, riportati in appendice \ref{b11}.\\\\
-I file \texttt{.mat} esportati da PIVlab contengono i campi di velocità per ciascun fotogramma dei video analizzati. Utilizzando un codice Matlab, è possibile generare delle animazioni che mostrano il campo di velocità, con una scala di colori per rappresentare l'intensità e delle frecce per indicare la direzione del flusso.\\\\
+I file \texttt{.mat} esportati da PIVlab contengono i campi di velocità per ciascun fotogramma dei video analizzati. Utilizzando un codice Matlab, è possibile generare delle animazioni che mostrano il campo di velocità, con una scala di colori per rappresentare l'intensità e delle frecce per indicare la direzione del flusso.
+\subsubsection{Campo di velocità istantanea}
+Estraendo il campo di velocità in un determinato istante, si ottiene il campo di velocità istantaneo:
 \begin{figure}[H]
     \centering
     \includegraphics[height=.52\textwidth]{images/11/f300_22b.png}
@@ -131,8 +133,10 @@ I file \texttt{.mat} esportati da PIVlab contengono i campi di velocità per cia
     \caption{Campi istantanei di velocità sovrapposti ai fotogrammi dei video}
 \end{figure}
 
-\noindent Si osserva come il flusso aumenta di velocità, ciò è dovuto alla geometria convergente del canale idrodinamico. Si osserva inoltre molto chiaramente lo sfilamento vorticoso.\\\\
-Mediando i campi di velocità di tutti i fotogrammi, si ottiene il seguente diagramma:
+\noindent Si osserva come il flusso aumenta di velocità, ciò è dovuto alla geometria convergente del canale idrodinamico. Si osserva inoltre molto chiaramente lo sfilamento vorticoso.
+
+\subsubsection{Campo di velocità media}
+Mediando il campo di velocità nel tempo, considerando quindi tutti i fotogrammi, si ottiene il seguente diagramma:
 \begin{figure}[H]
     \centering
     \includegraphics[width=.92\textwidth]{images/11/mean.png}
@@ -152,8 +156,8 @@ Mediando i campi di velocità di tutti i fotogrammi, si ottiene il seguente diag
     \caption{Componente trasversale della velocità media $v$ (cilindro 2022)}
 \end{figure}
 
-% DISCUTERE EVOLUZIONE DELLA VELOCITA' IN UN PUNTO FISSO (CIL 22, PLA 22)
-\noindent Per studiare il vortex shedding si può tracciare un diagramma della velocità in un punto fisso nello spazio, in corrispondenza dei vortici che si generano. Si ottengono quindi i seguenti risultati:
+\subsubsection{Vortex shedding}
+Per studiare il vortex shedding si può tracciare un diagramma della velocità in funzione del tempo in un punto fisso nello spazio, in corrispondenza dei vortici che si generano. Si ottengono quindi i seguenti risultati:
 \begin{figure}[H]
     \centering
     \includegraphics[width=.46\textwidth]{images/11/timeseries22.png}
@@ -229,19 +233,46 @@ Si ottengono i seguenti risultati:
 \end{figure}
 
 \noindent Il flusso che si sviluppa non risulta essere quello canonico 2D per via della sua dimensione finita che appoggia sulla parete inferiore della camera di prova. Inoltre, il piano di misura è a un diametro di distanza dal fondo, dove si sviluppa il vortice a ferro di cavallo (horseshoe vortex) e sono presenti effetti tridimensionali dovuti all'induzione del vortice. Per questi motivi i casi da studiare differiscono dai flussi canonici bidimensionali, pertanto, l'andamento Reynolds-Strouhal si discosta leggermente da quello studiato per il cilindro 2D utilizzando l'anemometria a filo caldo.
+
 \newpage
-\noindent Si procede al calcolo delle fluttuazioni di velocità sottraendo in ogni punto la velocità media temporale:
+\subsubsection{Fluttuazioni di velocità}
+Si procede al calcolo delle fluttuazioni di velocità sottraendo in ogni punto la velocità media temporale:
 \begin{equation*}
     u^\prime(t) = u(t) - \overline u \qquad v^\prime(t) = v(t) - \overline v  
 \end{equation*}
-Dalle fluttuazioni si può ricavare la varianza:
+Diagrammando le fluttuazioni di velocità per uno specifico fotogramma, si osserva molto chiaramente il fenomeno dello sfilamento vorticoso:
+% immagine cilindro 22 shedding fluttuazioni istantanee u
+% immagine cilindro 22 shedding fluttuazioni istantanee v
+
+\subsubsection{Conservazione dell'energia (Parseval)}
+Dalle fluttuazioni si può inoltre ricavare la varianza:
 \begin{equation*}
     \text{var}(\vec V) = \overline{{V^\prime}^2} = \frac 1{N_{frames}} \sum ({u^\prime}^2 + {v^\prime}^2)
 \end{equation*}
-Per il teorema di Paresval, la varianza risulta pari a:
+Secondo il teorema di Parseval, l'energia totale di un segnale nel dominio del tempo è uguale all'energia totale nel dominio delle frequenze. Applicando il teorema al caso in esame, la varianza delle fluttuazioni nel dominio del tempo deve essere uguale all'integrale dello spettro di potenza nel dominio delle frequenze.\\\\
+Considerando un segnale reale $x(t)$, la sua trasformata di Fourier $X(f)$ gode della proprietà di simmetria coniugata, cioè:
+\begin{equation*}
+    X(f) = X^*(-f)
+\end{equation*}
+di conseguenza, il suo modulo al quadrato, e quindi anche lo spettro di potenza, è simmetrico:
+\begin{equation*}
+    |X(f)|^2 = |X(-f)|^2 \quad \rightarrow \quad P(f) = P(-f)
+\end{equation*}
+L'energia totale nel dominio delle frequenze si calcola come:
+\begin{equation*}
+    E = \int_{-f_{samp}/2}^{f_{samp}/2} P(f) df
+\end{equation*}
+data la simmetria, si evince che:
+\begin{equation*}
+    \int_{-f_{samp}/2}^{f_{samp}/2} P(f) df = 2\int_0^{\frac{f_{samp}}2} P(f) df
+\end{equation*}
+Pertanto, per il teorema di Paresval, la varianza risulta pari a:
 \begin{equation*}
     \overline{{V^\prime}^2} = 2\int_0^{\frac{f_{samp}}2} P(f) df
 \end{equation*}
+Questa uguaglianza è verificata mediante un codice Matlab.
+
+\subsubsection{Sforzi di Reynolds}
 Dal campo di fluttuazioni di velocità si possono inoltre ricavare gli sforzi di Reynolds:
 \begin{equation*}
     \tau_{Re} = -\rho \overline{u^\prime v^\prime}
