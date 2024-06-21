@@ -117,9 +117,9 @@ def main():
     ps, ptot, q = load_files()
 
     qv = []
-    qv.append(Kt*(q[0][2, 1]-q[0][0, 1]))
+    qv.append(Kt*(q[0][1, 1]-q[0][0, 1]))
     qv.append(Kt*(q[1][1, 1]-q[1][0, 1]))
-    qv.append(Kt*(q[2][3, 1]-q[2][0, 1]))
+    qv.append(Kt*(q[2][1, 1]-q[2][0, 1]))
     qv.append(Kt*(q[3][1, 1]-q[3][0, 1]))
     qv = array(qv)
 
@@ -128,17 +128,17 @@ def main():
 
     eps, eptot, eq = [], [], []
     for i in range(4):
-        eps.append((ps[i][:, 1] - ps[i][1, 1])/qv[i])
-        eptot.append((ptot[i][:, 1] - ptot[i][1, 1])/qv[i])
-        eq.append((q[i][:, 1] - q[i][0, 1] - qv[i])/qv[i])
+        eps.append(Kt*(ps[i][1:, 1] - ps[i][1, 1])/qv[i])
+        eptot.append(Kt*(ptot[i][1:, 1] - ptot[i][1, 1])/qv[i])
+        eq.append(Kt*(q[i][1:, 1] - q[i][1, 1])/qv[i])
 
     figure(1)
     for i in range(4):
-        scatter(ps[i][:, 0], eps[i], label=f"Sq {i+1}, Re: {Re[i]:.0f}")
+        scatter(ps[i][1:, 0], eps[i], label=f"Sq {i+1}, Re: {Re[i]:.0f}")
     grid()
     title("Static Pressure")
     xlabel(r"$\alpha$ [deg]")
-    ylabel(r"$\varepsilon$ [Pa/V]")
+    ylabel(r"$\varepsilon$")
     legend()
     tight_layout()
     savefig("images/p", dpi=400)
@@ -146,11 +146,11 @@ def main():
 
     figure(2)
     for i in range(4):
-        scatter(ptot[i][:, 0], eptot[i], label=f"Sq {i+1}, Re: {Re[i]:.0f}")
+        scatter(ptot[i][1:, 0], eptot[i], label=f"Sq {i+1}, Re: {Re[i]:.0f}")
     grid()
     title("Total Pressure")
     xlabel(r"$\alpha$ [deg]")
-    ylabel(r"$\varepsilon$ [Pa/V]")
+    ylabel(r"$\varepsilon$")
     legend()
     tight_layout()
     savefig("images/ptot", dpi=400)
@@ -158,11 +158,11 @@ def main():
 
     figure(3)
     for i in range(4):
-        scatter(q[i][:, 0], eq[i], label=f"Sq {i+1}, Re: {Re[i]:.0f}")
+        scatter(q[i][1:, 0], eq[i], label=f"Sq {i+1}, Re: {Re[i]:.0f}")
     grid()
-    title("Dynamic Pressure")
+    title("Dynamic Pressure")  
     xlabel(r"$\alpha$ [deg]")
-    ylabel(r"$\varepsilon$ [Pa/V]")
+    ylabel(r"$\varepsilon$")
     legend()
     tight_layout()
     savefig("images/q", dpi=400)
